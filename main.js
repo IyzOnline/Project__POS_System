@@ -1,7 +1,12 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 
 let mainWindow
+
+ipcMain.handle('say-hello', async () => {
+  console.log('Hello World! - Main Process')
+  return "Hello from the Main Process!"
+})
 
 function createWindow() {
   mainWindow = new BrowserWindow({
