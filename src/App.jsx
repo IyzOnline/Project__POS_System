@@ -11,6 +11,7 @@ function App() {
   return (
     <>
       <h1>Below is the greeting!</h1>
+      <button onClick={handleClick}>Click to see greeting!</button>
       <p>{message}</p>
     </>
   )
