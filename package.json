@@ -2,9 +2,11 @@
   "name": "pos-project",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "main": "main.js",
+  "type": "commonjs",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"vite\" \"wait-on tcp:5173 && cross-env NODE_ENV=development electron . \"",
+    "dev-orig": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
