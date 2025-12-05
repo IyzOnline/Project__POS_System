@@ -279,5 +279,24 @@ class MenuItem(tk.Frame):
     else:
       print(f"Quantity is already at max -> {currentQuantity}")
 
+class Order():
+  def __init__(self):
+    pass
+
+  def addToOrder(self, itemName):
+    pass
+
+  def reduceFromOrder(self, itemName):
+    pass
+
+  def deleteFromOrder(self, itemName):
+    pass
+
+  def checkoutOrder(self):
+    pass
+
+  def cancelOrder(self):
+    pass
+
 app = App()
 app.mainloop()
