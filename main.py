@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 class App(tk.Tk):
   def __init__(self):
@@ -30,6 +31,25 @@ class App(tk.Tk):
     self.sidebarFrame.place(relx=0, rely=0, relwidth=0.1, relheight=1.0)
     self.menuFrame.place(relx=0.1, rely=0, relwidth=0.6, relheight=1.0)
     self.summaryFrame.place(relx=0.72, rely=0, relwidth=0.28, relheight=1.0)
+
+    self.initializeMenuArea()
+
+  def initializeMenuArea(self):
+    self.menuSearch = tk.Frame(self.menuFrame, bg="#8049df")
+    self.menuTable = tk.Frame(self.menuFrame, bg="#df4949")
+    self.menuLowerBtns = tk.Frame(self.menuFrame, bg="#448743")
+
+    self.menuSearch.place(relx=0, rely=0, relwidth=1.0, relheight=0.1)
+    self.menuTable.place(relx=0, rely=0.1, relwidth=1.0, relheight=0.8)
+    self.menuLowerBtns.place(relx=0, rely=0.9, relwidth=1.0, relheight=0.1)
+
+    self.createBtn = ttk.Button(self.menuLowerBtns, text="+")
+    self.deleteBtn = ttk.Button(self.menuLowerBtns, text="-")
+    self.editBtn = ttk.Button(self.menuLowerBtns, text="/")
+
+    self.createBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    self.deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    self.editBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
 app = App()
 app.mainloop()
