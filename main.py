@@ -48,7 +48,7 @@ class App(tk.Tk):
     self.menuTable.place(relx=0, rely=0.1, relwidth=1.0, relheight=0.8)
     self.menuLowerBtns.place(relx=0, rely=0.9, relwidth=1.0, relheight=0.1)
 
-    self.createBtn = ttk.Button(self.menuLowerBtns, text="+")
+    self.createBtn = ttk.Button(self.menuLowerBtns, text="+", command=self.createMenuItem)
     self.deleteBtn = ttk.Button(self.menuLowerBtns, text="-")
     self.editBtn = ttk.Button(self.menuLowerBtns, text="/")
 
@@ -63,6 +63,30 @@ class App(tk.Tk):
       print(recordValues)
       item = MenuItem(self.menuTable, recordValues)
       item.pack()
+
+  def createMenuItem(self):
+    self.homeFrame.pack_forget()
+
+    self.createMIFrame = tk.Frame(self)
+
+    self.nameEntry = ttk.Entry(self.createMIFrame, width=30, font=("Helvetica", 14))
+    self.priceEntry = ttk.Entry(self.createMIFrame, width=30, font=("Helvetica", 14))
+    self.categoryEntry = ttk.Entry(self.createMIFrame, width=30, font=("Helvetica", 14))
+
+    self.createMIFrame.pack()
+
+    self.returnBtn = ttk.Button(self.createMIFrame, text="return")
+    self.saveBtn = ttk.Button(self.createMIFrame, text="Save to DB")
+
+    ttk.Label(self.createMIFrame, text="- Name -").pack()
+    self.nameEntry.pack()
+    ttk.Label(self.createMIFrame, text="- Price -").pack()
+    self.priceEntry.pack()
+    ttk.Label(self.createMIFrame, text="- Category -").pack()
+    self.categoryEntry.pack()
+
+    self.returnBtn.pack()
+    self.saveBtn.pack()
 
 #storage implementation
   def initDB(self):
