@@ -42,7 +42,6 @@ class App(tk.Tk):
     self.summaryFrame.place(relx=0.72, rely=0, relwidth=0.28, relheight=1.0)
 
     self.initializeMenuArea()
-    self.initializeMenuItems()
 
   def initializeMenuArea(self):
     self.menuSearch = tk.Frame(self.menuFrame, bg="#8049df")
@@ -60,6 +59,8 @@ class App(tk.Tk):
     self.createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     self.deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
     self.editBtn.pack(side=tk.LEFT, padx=5, pady=5)
+
+    self.initializeMenuItems()
 
   def initializeMenuItems(self):
     if (len(self.__MenuItemRecords) == 0):
@@ -242,7 +243,7 @@ class MenuItem(tk.Frame):
     self.categoryLbl.pack()
     self.createBtns()
 
-    print("d: Proto Frame saved successfully.")
+    print("---\n\nd: Proto Frame saved successfully.\n\n---")
 
   def createBtns(self):
     self.btnFrame = tk.Frame(self)
