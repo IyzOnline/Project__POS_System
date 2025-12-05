@@ -142,6 +142,44 @@ class MenuItem(tk.Frame):
     self.nameLbl.pack()
     self.priceLbl.pack()
     self.categoryLbl.pack()
+    self.createBtns()
+
+    print("d: Proto Frame saved successfully.")
+
+  def createBtns(self):
+    self.btnFrame = tk.Frame(self)
+    self.quantity = tk.IntVar()
+
+    self.increaseBtn = ttk.Button(self.btnFrame, text="+", command=self.increaseQuantity)
+    self.quantityLbl = ttk.Label(self.btnFrame, textvariable=self.quantity)
+    self.decreaseBtn = ttk.Button(self.btnFrame, text="-", command=self.decreaseQuantity)
+
+    self.increaseBtn.bind("<Return>", self.increaseQuantity)
+    self.decreaseBtn.bind("<Return>", self.decreaseQuantity)
+
+    self.increaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    self.quantityLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    self.decreaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
+
+    self.btnFrame.pack()
+
+    print("d: Buttons for Proto Frame packed.")
+    
+  def decreaseQuantity(self, event=None):
+    currentQuantity = self.quantity.get()
+    if currentQuantity > 0:
+      self.quantity.set(currentQuantity - 1)
+      print(f"Quantity decreased to {currentQuantity - 1}")
+    else:
+      print(f"Quantity is already {currentQuantity}")
+      
+  def increaseQuantity(self, event=None):
+    currentQuantity = self.quantity.get()
+    if currentQuantity < 10:
+      self.quantity.set(currentQuantity + 1)
+      print(f"Quantity increased to {currentQuantity + 1}")
+    else:
+      print(f"Quantity is already at max -> {currentQuantity}")
 
 app = App()
 app.mainloop()
