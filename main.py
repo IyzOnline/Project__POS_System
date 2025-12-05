@@ -215,6 +215,16 @@ class App(tk.Tk):
   def editMenuItem(self):
     self.__cursor.execute("UPDATE ")
 
+  def printMenuLength(self):
+    print(len(self.__MenuItemRecords))
+
+  def displayItemsInConsole(self):
+    rows = self.__cursor.execute("SELECT * FROM menu_items")
+
+    for row in rows:
+      print("----\nItems in MenuItemRecord: ")
+      print(f"Name: {row[1]}")
+
 class MenuItem(tk.Frame):
   def __init__(self, parent, MenuItemRecord):
     super().__init__(parent)
