@@ -67,6 +67,20 @@ class App(tk.Tk):
   def createMenuItem(self):
     self.homeFrame.pack_forget()
 
+    def passData():
+      data = (self.nameEntry.get(), 
+              int(self.priceEntry.get()), 
+              self.categoryEntry.get(), 
+              str(Path("images") / "pikachu.png")
+            )
+      
+      self.nameEntry.delete(0, tk.END)
+      self.priceEntry.delete(0, tk.END)
+      self.categoryEntry.delete(0, tk.END)
+
+      print(data)
+      return data
+
     self.createMIFrame = tk.Frame(self)
 
     self.nameEntry = ttk.Entry(self.createMIFrame, width=30, font=("Helvetica", 14))
@@ -76,7 +90,7 @@ class App(tk.Tk):
     self.createMIFrame.pack()
 
     self.returnBtn = ttk.Button(self.createMIFrame, text="return")
-    self.saveBtn = ttk.Button(self.createMIFrame, text="Save to DB")
+    self.saveBtn = ttk.Button(self.createMIFrame, text="Save to DB", command=lambda: self.addMenuItem(passData()))
 
     ttk.Label(self.createMIFrame, text="- Name -").pack()
     self.nameEntry.pack()
@@ -148,7 +162,22 @@ class App(tk.Tk):
         print(f"Item {row[0]}: {MenuItemRecord['name']}")
 
       print("Initialization of Menu Items Complete.")
-    
+
+  def addMenuItem(self, data):
+    print(f"Here is data in adding: {data}")
+    self.__cursor.execute("INSERT INTO menu_items (name, price, category, imageFileName) VALUES (?, ?, ?, ?)", data)
+
+    MenuItemRecord = {
+      "name": data[0],
+      "price": data[1],
+      "category": data[2],
+      "imagePath": data[3]
+    }
+
+    self.__MenuItemRecords[MenuItemRecord['name']] = MenuItemRecord
+
+    self.commitDBChanges("d: prototype data saved to menu_items table in DB")
+
 class MenuItem(tk.Frame):
   def __init__(self, parent, MenuItemRecord):
     super().__init__(parent)
