@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+import sqlite3
+from pathlib import Path
+import sys
 
 class App(tk.Tk):
   def __init__(self):
@@ -51,5 +54,49 @@ class App(tk.Tk):
     self.deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
     self.editBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
+#storage implementation
+  def initDB(self):
+    self.__conn = sqlite3.connect(Path("db")/"menuitems.db")
+    self.__cursor = self.__conn.cursor()
+
+    self.__cursor.execute("""
+                          CREATE TABLE IF NOT EXISTS menu_items (
+                            menuItemID INTEGER PRIMARY KEY AUTOINCREMENT,
+                            name TEXT UNIQUE NOT NULL,
+                            price INTEGER NOT NULL,
+                            category TEXT NOT NULL,
+                            imageFileName TEXT NOT NULL
+                          )
+                          """)
+    
+    self.__cursor.execute("""
+                          CREATE TABLE IF NOT EXISTS orders (
+                            orderID INTEGER PRIMARY KEY AUTOINCREMENT,
+                            date TEXT
+                          )
+                          """)
+    
+    self.__cursor.execute("""
+                          CREATE TABLE IF NOT EXISTS order_items (
+                            itemID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                            orderID INTEGER,
+                            name TEXT,
+                            quantity INTEGER,
+                            FOREIGN KEY(orderID) REFERENCES orders(orderID)
+                          )
+                          """)
+    
+    self.commitDBChanges("d: menu_items table saved in DB")
+
+def commitDBChanges(self, descrip):
+    try:
+      self.__conn.commit()
+      print(descrip)
+    except Exception as e:
+      #PUT MORE ERROR HANDLING HERE
+      print(e)
+      self.__conn.rollback()
+      sys.exit(1)
+    
 app = App()
 app.mainloop()
