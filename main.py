@@ -15,6 +15,8 @@ class App(tk.Tk):
     self.__MenuItemInstances = {}
 
     self.initializeExitFS()
+    self.initDB()
+    self.initializeHomePage()
 
 #UI Implementation
   def initializeExitFS(self):
