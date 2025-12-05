@@ -88,15 +88,32 @@ class App(tk.Tk):
     
     self.commitDBChanges("d: menu_items table saved in DB")
 
-def commitDBChanges(self, descrip):
-    try:
-      self.__conn.commit()
-      print(descrip)
-    except Exception as e:
-      #PUT MORE ERROR HANDLING HERE
-      print(e)
-      self.__conn.rollback()
-      sys.exit(1)
+  def commitDBChanges(self, descrip):
+      try:
+        self.__conn.commit()
+        print(descrip)
+      except Exception as e:
+        #PUT MORE ERROR HANDLING HERE
+        print(e)
+        self.__conn.rollback()
+        sys.exit(1)
+
+  def initMenuItemsfromDB(self):
+      rows = self.__cursor.execute("SELECT * FROM menu_items")
+
+      print("Initializing Menu Items...")
+      for row in rows:
+        MenuItemRecord = {
+          "name": row[1],
+          "price": row[2],
+          "category": row[3],
+          "imagePath": row[4]
+        }
+
+        self.__MenuItemRecords[MenuItemRecord['name']] = MenuItemRecord
+        print(f"Item {row[0]}: {MenuItemRecord['name']}")
+
+      print("Initialization of Menu Items Complete.")
     
 app = App()
 app.mainloop()
