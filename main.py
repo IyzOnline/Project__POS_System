@@ -3,6 +3,7 @@ from tkinter import ttk
 import sqlite3
 from pathlib import Path
 import sys
+from PIL import Image, ImageTk
 
 class App(tk.Tk):
   def __init__(self):
@@ -115,5 +116,32 @@ class App(tk.Tk):
 
       print("Initialization of Menu Items Complete.")
     
+class MenuItem(tk.Frame):
+  def __init__(self, parent, MenuItemRecord):
+    super().__init__(parent)
+
+    self.__name = tk.StringVar(value=MenuItemRecord['name'])
+    self.__price = tk.IntVar(value=MenuItemRecord['price'])
+    self.__category = tk.StringVar(value=MenuItemRecord['category'])
+
+    originalImage = Image.open(MenuItemRecord['imagePath'])
+    resizeImage = originalImage.resize((150, 150), Image.LANCZOS)
+    self.__imagePath = ImageTk.PhotoImage(resizeImage)
+
+    #print("--\nPrinting New Menu Item")
+    #print(f"String Var Name: {self.__name.get()}")
+    #print(f"Int Var Price: {self.__price.get()}")
+    #print(f"String Var Category: {self.__category.get()}")
+
+    self.nameLbl = tk.Label(self, textvariable=self.__name)
+    self.priceLbl = tk.Label(self, textvariable=self.__price)
+    self.categoryLbl = tk.Label(self, textvariable=self.__category)
+    self.imageLbl = tk.Label(self, image=self.__imagePath)
+
+    self.imageLbl.pack()
+    self.nameLbl.pack()
+    self.priceLbl.pack()
+    self.categoryLbl.pack()
+
 app = App()
 app.mainloop()
