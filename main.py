@@ -9,5 +9,15 @@ class App(tk.Tk):
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
 
+    self.initializeExitFS()
+    
+  def initializeExitFS(self):
+    self.attributes('-fullscreen', True)
+    self.bind('<Escape>', self.exit_fullscreen)
+
+  def exit_fullscreen(self, event=None):
+    self.attributes('-fullscreen', False)
+  
+
 app = App()
 app.mainloop()
