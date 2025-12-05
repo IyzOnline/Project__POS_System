@@ -26,6 +26,9 @@ class App(tk.Tk):
   def exit_fullscreen(self, event=None):
     self.attributes('-fullscreen', False)
   
+  def initializeStyleObjects(self):
+    pass
+
   def initializeHomePage(self):
     self.homeFrame = tk.Frame(self, bg="#ffffff")
     self.homeFrame.pack(expand=True, fill="both", padx=20, pady=20)
@@ -108,6 +111,26 @@ class App(tk.Tk):
     currentFrame.pack_forget()
     self.initializeHomePage()
 
+  def editMenuItem(self):
+    pass
+
+  def deleteMenuItem(self):
+    pass 
+
+  #Sidebar
+  def initializeSidebar_Proto(self):
+    pass
+
+  def initializeSidebar(self):
+    pass
+
+  #Receipt
+  def initializeReceipt_Proto(self):
+    pass
+
+  def initializeReceipt(self):
+    pass
+
 #storage implementation
   def initDB(self):
     self.__conn = sqlite3.connect(Path("db")/"menuitems.db")
@@ -183,6 +206,13 @@ class App(tk.Tk):
     self.__MenuItemRecords[MenuItemRecord['name']] = MenuItemRecord
 
     self.commitDBChanges("d: prototype data saved to menu_items table in DB")
+
+  def removeMenuItem(self):
+    #need to ask for confirmation from user then delete from DB
+    self.__cursor.execute("DELETE ")
+
+  def editMenuItem(self):
+    self.__cursor.execute("UPDATE ")
 
 class MenuItem(tk.Frame):
   def __init__(self, parent, MenuItemRecord):
