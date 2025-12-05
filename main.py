@@ -37,6 +37,7 @@ class App(tk.Tk):
     self.summaryFrame.place(relx=0.72, rely=0, relwidth=0.28, relheight=1.0)
 
     self.initializeMenuArea()
+    self.initializeMenuItems()
 
   def initializeMenuArea(self):
     self.menuSearch = tk.Frame(self.menuFrame, bg="#8049df")
@@ -54,6 +55,14 @@ class App(tk.Tk):
     self.createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     self.deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
     self.editBtn.pack(side=tk.LEFT, padx=5, pady=5)
+
+  def initializeMenuItems(self):
+    if (len(self.__MenuItemRecords) == 0):
+      self.initMenuItemsfromDB()
+    for recordName, recordValues in self.__MenuItemRecords.items():
+      print(recordValues)
+      item = MenuItem(self.menuTable, recordValues)
+      item.pack()
 
 #storage implementation
   def initDB(self):
