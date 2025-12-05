@@ -89,7 +89,7 @@ class App(tk.Tk):
 
     self.createMIFrame.pack()
 
-    self.returnBtn = ttk.Button(self.createMIFrame, text="return")
+    self.returnBtn = ttk.Button(self.createMIFrame, text="return", command=lambda: self.returnToHome(self.createMIFrame))
     self.saveBtn = ttk.Button(self.createMIFrame, text="Save to DB", command=lambda: self.addMenuItem(passData()))
 
     ttk.Label(self.createMIFrame, text="- Name -").pack()
@@ -101,6 +101,10 @@ class App(tk.Tk):
 
     self.returnBtn.pack()
     self.saveBtn.pack()
+
+  def returnToHome(self, currentFrame):
+    currentFrame.pack_forget()
+    self.initializeHomePage()
 
 #storage implementation
   def initDB(self):
