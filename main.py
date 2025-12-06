@@ -238,6 +238,7 @@ class MenuItem(tk.Frame):
     self.__name = tk.StringVar(value=MenuItemRecord['name'])
     self.__price = tk.IntVar(value=MenuItemRecord['price'])
     self.__category = tk.StringVar(value=MenuItemRecord['category'])
+    self.quantity = tk.IntVar()
 
     self.nameLbl = tk.Label(self, textvariable=self.__name)
     self.priceLbl = tk.Label(self, textvariable=self.__price)
@@ -246,20 +247,15 @@ class MenuItem(tk.Frame):
     self.nameLbl.pack(side=tk.LEFT, padx=5, pady=5)
     self.priceLbl.pack(side=tk.LEFT, padx=5, pady=5)
     self.categoryLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    self.createBtns()
 
     print("---\n\nd: Proto Frame saved successfully.\n\n---")
 
-  def createBtns(self):
-    pass
-
   def createAdminBtns(self):
-    btnFrame = tk.Frame(self)
-    self.quantity = tk.IntVar()
+    self.adminBtnFrame = tk.Frame(self)
 
-    increaseBtn = ttk.Button(btnFrame, text="+", command=self.increaseQuantity)
-    quantityLbl = ttk.Label(btnFrame, textvariable=self.quantity)
-    decreaseBtn = ttk.Button(btnFrame, text="-", command=self.decreaseQuantity)
+    increaseBtn = ttk.Button(self.adminBtnFrame, text="+", command=self.increaseQuantity)
+    quantityLbl = ttk.Label(self.adminBtnFrame, textvariable=self.quantity)
+    decreaseBtn = ttk.Button(self.adminBtnFrame, text="-", command=self.decreaseQuantity)
 
     increaseBtn.bind("<Return>", self.increaseQuantity)
     decreaseBtn.bind("<Return>", self.decreaseQuantity)
@@ -268,7 +264,7 @@ class MenuItem(tk.Frame):
     quantityLbl.pack(side=tk.LEFT, padx=5, pady=5)
     decreaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
-    btnFrame.pack()
+    self.adminBtnFrame.pack()
 
     print("d: Buttons for Proto Frame packed.")
     
