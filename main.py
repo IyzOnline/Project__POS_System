@@ -243,12 +243,40 @@ class MenuItem(tk.Frame):
     self.nameLbl = tk.Label(self, textvariable=self.__name)
     self.priceLbl = tk.Label(self, textvariable=self.__price)
     self.categoryLbl = tk.Label(self, textvariable=self.__category)
+    self.addToOrderBtn = ttk.Button(self, text="ADD", command=(self.addItemPopUp()))
 
     self.nameLbl.pack(side=tk.LEFT, padx=5, pady=5)
     self.priceLbl.pack(side=tk.LEFT, padx=5, pady=5)
     self.categoryLbl.pack(side=tk.LEFT, padx=5, pady=5)
 
     print("---\n\nd: Proto Frame saved successfully.\n\n---")
+
+  def addItemPopUp(self):
+    self.popUp.pack(side=tk.LEFT, padx=5, pady=5)
+
+  def initItemPopUp(self, parent):
+    self.popUp = tk.Frame(parent, bd=2, relef="raised")
+
+    popNameLbl = ttk.Label(self.popUp, textvariable=self.__name)
+    popPriceLbl = ttk.Label(self.popUp, textvariable=self.__price)
+    popCategoryLbl = ttk.Label(self, textvariable=self.__category)
+    quantityLbl = ttk.Label(self.popUp, textvariable=self.quantity)
+    
+    increaseBtn = ttk.Button(self.popUp, text="+", command=self.increaseQuantity)
+    decreaseBtn = ttk.Button(self.popUp, text="-", command=self.decreaseQuantity)
+    finalAddBtn = ttk.Button(self.popUp, text="save")
+
+    increaseBtn.bind("<Return>", self.increaseQuantity)
+    decreaseBtn.bind("<Return>", self.decreaseQuantity)
+
+    popNameLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    popPriceLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    popCategoryLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    increaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    quantityLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    decreaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
+
+    print("d: Buttons for PopUp Frame packed.")
 
   def createAdminBtns(self):
     self.adminBtnFrame = tk.Frame(self)
