@@ -43,6 +43,7 @@ class App(tk.Tk):
 
     self.initializeMenuArea()
 
+  #Menu
   def initializeMenuArea(self):
     self.menuSearch = tk.Frame(self.menuFrame, bg="#8049df")
     self.menuTable = tk.Frame(self.menuFrame, bg="#df4949")
@@ -52,13 +53,13 @@ class App(tk.Tk):
     self.menuTable.place(relx=0, rely=0.1, relwidth=1.0, relheight=0.8)
     self.menuLowerBtns.place(relx=0, rely=0.9, relwidth=1.0, relheight=0.1)
 
-    self.createBtn = ttk.Button(self.menuLowerBtns, text="+", command=self.createMenuItem)
-    self.deleteBtn = ttk.Button(self.menuLowerBtns, text="-")
-    self.editBtn = ttk.Button(self.menuLowerBtns, text="/")
+    createBtn = ttk.Button(self.menuLowerBtns, text="+", command=self.createMenuItem)
+    deleteBtn = ttk.Button(self.menuLowerBtns, text="-")
+    editBtn = ttk.Button(self.menuLowerBtns, text="/")
 
-    self.createBtn.pack(side=tk.LEFT, padx=5, pady=5)
-    self.deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
-    self.editBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    createBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    editBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
     self.initializeMenuItems()
 
@@ -74,39 +75,39 @@ class App(tk.Tk):
     self.homeFrame.pack_forget()
 
     def passData():
-      data = (self.nameEntry.get(), 
-              int(self.priceEntry.get()), 
-              self.categoryEntry.get(), 
+      data = (nameEntry.get(), 
+              int(priceEntry.get()), 
+              categoryEntry.get(), 
               str(Path("images") / "pikachu.png")
             )
       
-      self.nameEntry.delete(0, tk.END)
-      self.priceEntry.delete(0, tk.END)
-      self.categoryEntry.delete(0, tk.END)
+      nameEntry.delete(0, tk.END)
+      priceEntry.delete(0, tk.END)
+      categoryEntry.delete(0, tk.END)
 
       print(data)
       return data
 
-    self.createMIFrame = tk.Frame(self)
+    createMIFrame = tk.Frame(self)
 
-    self.nameEntry = ttk.Entry(self.createMIFrame, width=30, font=("Helvetica", 14))
-    self.priceEntry = ttk.Entry(self.createMIFrame, width=30, font=("Helvetica", 14))
-    self.categoryEntry = ttk.Entry(self.createMIFrame, width=30, font=("Helvetica", 14))
+    nameEntry = ttk.Entry(createMIFrame, width=30, font=("Helvetica", 14))
+    priceEntry = ttk.Entry(createMIFrame, width=30, font=("Helvetica", 14))
+    categoryEntry = ttk.Entry(createMIFrame, width=30, font=("Helvetica", 14))
 
-    self.createMIFrame.pack()
+    createMIFrame.pack()
 
-    self.returnBtn = ttk.Button(self.createMIFrame, text="return", command=lambda: self.returnToHome(self.createMIFrame))
-    self.saveBtn = ttk.Button(self.createMIFrame, text="Save to DB", command=lambda: self.addMenuItem(passData()))
+    returnBtn = ttk.Button(createMIFrame, text="return", command=lambda: self.returnToHome(createMIFrame))
+    saveBtn = ttk.Button(createMIFrame, text="Save to DB", command=lambda: self.addMenuItem(passData()))
 
-    ttk.Label(self.createMIFrame, text="- Name -").pack()
-    self.nameEntry.pack()
-    ttk.Label(self.createMIFrame, text="- Price -").pack()
-    self.priceEntry.pack()
-    ttk.Label(self.createMIFrame, text="- Category -").pack()
-    self.categoryEntry.pack()
+    ttk.Label(createMIFrame, text="- Name -").pack()
+    nameEntry.pack()
+    ttk.Label(createMIFrame, text="- Price -").pack()
+    priceEntry.pack()
+    ttk.Label(createMIFrame, text="- Category -").pack()
+    categoryEntry.pack()
 
-    self.returnBtn.pack()
-    self.saveBtn.pack()
+    returnBtn.pack()
+    saveBtn.pack()
 
   def returnToHome(self, currentFrame):
     currentFrame.pack_forget()
