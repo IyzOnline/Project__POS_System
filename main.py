@@ -3,7 +3,6 @@ from tkinter import ttk
 import sqlite3
 from pathlib import Path
 import sys
-from PIL import Image, ImageTk
 
 class App(tk.Tk):
   def __init__(self):
@@ -87,8 +86,7 @@ class App(tk.Tk):
     def passData():
       data = (nameEntry.get(), 
               int(priceEntry.get()), 
-              categoryEntry.get(), 
-              str(Path("images") / "pikachu.png")
+              categoryEntry.get()
             )
       
       nameEntry.delete(0, tk.END)
@@ -153,8 +151,7 @@ class App(tk.Tk):
                             menuItemID INTEGER PRIMARY KEY AUTOINCREMENT,
                             name TEXT UNIQUE NOT NULL,
                             price INTEGER NOT NULL,
-                            category TEXT NOT NULL,
-                            imageFileName TEXT NOT NULL
+                            category TEXT NOT NULL
                           )
                           """)
     
@@ -196,7 +193,6 @@ class App(tk.Tk):
           "name": row[1],
           "price": row[2],
           "category": row[3],
-          "imagePath": row[4]
         }
 
         self.__MenuItemRecords[MenuItemRecord['name']] = MenuItemRecord
@@ -206,13 +202,12 @@ class App(tk.Tk):
 
   def addMenuItem(self, data):
     print(f"Here is data in adding: {data}")
-    self.__cursor.execute("INSERT INTO menu_items (name, price, category, imageFileName) VALUES (?, ?, ?, ?)", data)
+    self.__cursor.execute("INSERT INTO menu_items (name, price, category) VALUES (?, ?, ?)", data)
 
     MenuItemRecord = {
       "name": data[0],
       "price": data[1],
       "category": data[2],
-      "imagePath": data[3]
     }
 
     self.__MenuItemRecords[MenuItemRecord['name']] = MenuItemRecord
@@ -244,44 +239,36 @@ class MenuItem(tk.Frame):
     self.__price = tk.IntVar(value=MenuItemRecord['price'])
     self.__category = tk.StringVar(value=MenuItemRecord['category'])
 
-    originalImage = Image.open(MenuItemRecord['imagePath'])
-    resizeImage = originalImage.resize((150, 150), Image.LANCZOS)
-    self.__imagePath = ImageTk.PhotoImage(resizeImage)
-
-    #print("--\nPrinting New Menu Item")
-    #print(f"String Var Name: {self.__name.get()}")
-    #print(f"Int Var Price: {self.__price.get()}")
-    #print(f"String Var Category: {self.__category.get()}")
-
     self.nameLbl = tk.Label(self, textvariable=self.__name)
     self.priceLbl = tk.Label(self, textvariable=self.__price)
     self.categoryLbl = tk.Label(self, textvariable=self.__category)
-    self.imageLbl = tk.Label(self, image=self.__imagePath)
 
-    self.imageLbl.pack()
-    self.nameLbl.pack()
-    self.priceLbl.pack()
-    self.categoryLbl.pack()
+    self.nameLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    self.priceLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    self.categoryLbl.pack(side=tk.LEFT, padx=5, pady=5)
     self.createBtns()
 
     print("---\n\nd: Proto Frame saved successfully.\n\n---")
 
   def createBtns(self):
-    self.btnFrame = tk.Frame(self)
+    pass
+
+  def createAdminBtns(self):
+    btnFrame = tk.Frame(self)
     self.quantity = tk.IntVar()
 
-    self.increaseBtn = ttk.Button(self.btnFrame, text="+", command=self.increaseQuantity)
-    self.quantityLbl = ttk.Label(self.btnFrame, textvariable=self.quantity)
-    self.decreaseBtn = ttk.Button(self.btnFrame, text="-", command=self.decreaseQuantity)
+    increaseBtn = ttk.Button(btnFrame, text="+", command=self.increaseQuantity)
+    quantityLbl = ttk.Label(btnFrame, textvariable=self.quantity)
+    decreaseBtn = ttk.Button(btnFrame, text="-", command=self.decreaseQuantity)
 
-    self.increaseBtn.bind("<Return>", self.increaseQuantity)
-    self.decreaseBtn.bind("<Return>", self.decreaseQuantity)
+    increaseBtn.bind("<Return>", self.increaseQuantity)
+    decreaseBtn.bind("<Return>", self.decreaseQuantity)
 
-    self.increaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
-    self.quantityLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    self.decreaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    increaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    quantityLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    decreaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
-    self.btnFrame.pack()
+    btnFrame.pack()
 
     print("d: Buttons for Proto Frame packed.")
     
