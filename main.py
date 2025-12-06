@@ -67,7 +67,7 @@ class App(tk.Tk):
     self.searchValue = tk.StringVar()
     self.searchValue.trace_add("write", self.searchThroughRecords)
     searchEntry = ttk.Entry(self.menuSearch, textvariable=self.searchValue, width=60, font=("Helvetica", 14))
-    
+    searchEntry.pack(expand=True)
 
   def searchThroughRecords(self, *args):
     print("Records Searched!")
@@ -78,7 +78,7 @@ class App(tk.Tk):
     for recordName, recordValues in self.__MenuItemRecords.items():
       print(recordValues)
       item = MenuItem(self.menuTable, recordValues)
-      
+      item.pack(fill="x")
 
   def createMenuItem(self):
     self.homeFrame.pack_forget()
