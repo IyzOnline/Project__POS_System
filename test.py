@@ -21,7 +21,7 @@ for r_index, row in enumerate(data):
             table_container,
             text=str(item),
             width=15,
-            anchor="w",
+            anchor="center",
             padx=5,
             pady=3
         )

@@ -67,7 +67,7 @@ class App(tk.Tk):
     self.searchValue = tk.StringVar()
     self.searchValue.trace_add("write", self.searchThroughRecords)
     searchEntry = ttk.Entry(self.menuSearch, textvariable=self.searchValue, width=60, font=("Helvetica", 14))
-    searchEntry.pack()
+    
 
   def searchThroughRecords(self, *args):
     print("Records Searched!")
@@ -78,7 +78,7 @@ class App(tk.Tk):
     for recordName, recordValues in self.__MenuItemRecords.items():
       print(recordValues)
       item = MenuItem(self.menuTable, recordValues)
-      item.pack()
+      
 
   def createMenuItem(self):
     self.homeFrame.pack_forget()
@@ -243,58 +243,57 @@ class MenuItem(tk.Frame):
     self.nameLbl = tk.Label(self, textvariable=self.__name)
     self.priceLbl = tk.Label(self, textvariable=self.__price)
     self.categoryLbl = tk.Label(self, textvariable=self.__category)
-    self.addToOrderBtn = ttk.Button(self, text="ADD", command=(self.addItemPopUp()))
+    self.addToOrderBtn = ttk.Button(self, text="ADD", command=lambda: self.addItemPopUp(parent))
 
     self.nameLbl.pack(side=tk.LEFT, padx=5, pady=5)
     self.priceLbl.pack(side=tk.LEFT, padx=5, pady=5)
     self.categoryLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    self.addToOrderBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
-    print("---\n\nd: Proto Frame saved successfully.\n\n---")
+    print("---\n\nd: Menu Item row creation was successful.\n\n---")
 
-  def addItemPopUp(self):
-    self.popUp.pack(side=tk.LEFT, padx=5, pady=5)
-
-  def initItemPopUp(self, parent):
-    self.popUp = tk.Frame(parent, bd=2, relef="raised")
+  def addItemPopUp(self, parent):
+    self.popUp = tk.Frame(parent, bd=2, relief="raised")
 
     popNameLbl = ttk.Label(self.popUp, textvariable=self.__name)
     popPriceLbl = ttk.Label(self.popUp, textvariable=self.__price)
-    popCategoryLbl = ttk.Label(self, textvariable=self.__category)
-    quantityLbl = ttk.Label(self.popUp, textvariable=self.quantity)
-    
-    increaseBtn = ttk.Button(self.popUp, text="+", command=self.increaseQuantity)
-    decreaseBtn = ttk.Button(self.popUp, text="-", command=self.decreaseQuantity)
-    finalAddBtn = ttk.Button(self.popUp, text="save")
+    popCategoryLbl = ttk.Label(self.popUp, textvariable=self.__category)
 
-    increaseBtn.bind("<Return>", self.increaseQuantity)
-    decreaseBtn.bind("<Return>", self.decreaseQuantity)
+    popNameLbl.pack(padx=5, pady=5)
+    popPriceLbl.pack(padx=5, pady=5)
+    popCategoryLbl.pack(padx=5, pady=5)
+    self.createBtns()
 
-    popNameLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    popPriceLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    popCategoryLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    increaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    self.popUp.place(relx=0.5, rely=0.5, anchor="center", width=300, height=200)
+    self.popUp.lift()
+    self.increaseBtn.focus_set()
+
+  def createBtns(self):
+    self.btnFrame = tk.Frame(self.popUp)
+    quantityLbl = ttk.Label(self.btnFrame, textvariable=self.quantity)
+    self.increaseBtn = ttk.Button(self.btnFrame, text="+", command=self.increaseQuantity)
+    self.decreaseBtn = ttk.Button(self.btnFrame, text="-", command=self.decreaseQuantity)
+    self.finalAddBtn = ttk.Button(self.popUp, text="save", command=self.addToOrder)
+
+    self.increaseBtn.bind("<Return>", self.increaseQuantity)
+    self.decreaseBtn.bind("<Return>", self.decreaseQuantity)
+    self.finalAddBtn.bind("<Return>", self.addToOrder)
+
+    self.increaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
     quantityLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    decreaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    self.decreaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
+
+    self.btnFrame.pack()
+    self.finalAddBtn.pack(padx=5, pady=5)
 
     print("d: Buttons for PopUp Frame packed.")
 
-  def createAdminBtns(self):
-    self.adminBtnFrame = tk.Frame(self)
-
-    increaseBtn = ttk.Button(self.adminBtnFrame, text="+", command=self.increaseQuantity)
-    quantityLbl = ttk.Label(self.adminBtnFrame, textvariable=self.quantity)
-    decreaseBtn = ttk.Button(self.adminBtnFrame, text="-", command=self.decreaseQuantity)
-
-    increaseBtn.bind("<Return>", self.increaseQuantity)
-    decreaseBtn.bind("<Return>", self.decreaseQuantity)
-
-    increaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
-    quantityLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    decreaseBtn.pack(side=tk.LEFT, padx=5, pady=5)
-
-    self.adminBtnFrame.pack()
-
-    print("d: Buttons for Proto Frame packed.")
+  def addToOrder(self, event=None):
+    if self.quantity.get() < 1:
+      print("Quantity cannot be zero")
+    else:
+      self.popUp.destroy()
+      print("====\nAdded to order!\n====")
     
   def decreaseQuantity(self, event=None):
     currentQuantity = self.quantity.get()
