@@ -62,6 +62,16 @@ class App(tk.Tk):
     editBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
     self.initializeMenuItems()
+    self.initializeSearchArea()
+
+  def initializeSearchArea(self):
+    self.searchValue = tk.StringVar()
+    self.searchValue.trace_add("write", self.searchThroughRecords)
+    searchEntry = ttk.Entry(self.menuSearch, textvariable=self.searchValue, width=60, font=("Helvetica", 14))
+    searchEntry.pack()
+
+  def searchThroughRecords(self, *args):
+    print("Records Searched!")
 
   def initializeMenuItems(self):
     if (len(self.__MenuItemRecords) == 0):
