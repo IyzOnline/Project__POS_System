@@ -314,6 +314,9 @@ class Order():
   def deleteFromOrder(self, itemName):
     pass
 
+  def deleteEntireOrder(self):
+    pass
+
   def checkoutOrder(self):
     pass
 
