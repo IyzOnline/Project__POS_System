@@ -86,7 +86,7 @@ class App(tk.Tk) :
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
     editBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
-    self.initColumns()
+    self.initMenuTableColumns()
     self.initializeMenuItems()
     self.initializeSearchArea()
 
@@ -99,7 +99,7 @@ class App(tk.Tk) :
   def searchThroughRecords(self, *args):
     print("Records Searched!")
 
-  def initColumns(self) :
+  def initMenuTableColumns(self) :
     columns = tk.Frame(self.menuTable)
     
     nameCol = ttk.Label(columns, text="Name", style="Cell.TLabel", anchor="center")
