@@ -409,6 +409,10 @@ class Order():
       self.orderNum = 1
 
   def saveOrderToDB(self) :
+    if not self.__listOfOrders:
+      print("Order is empty!")
+      return 
+
     dateTimeOrder = datetime.datetime.now().isoformat()
     self.__cursor.execute("INSERT INTO orders (date) VALUES (?)", (dateTimeOrder,))
 
