@@ -1,0 +1,7 @@
+an item is added to __MenuItemInstances when the SAVE button is clicked.
+
+Thus, when I add an item, this is what happens:
+1. __MenuItemInstances is initially empty.
+2. I press ADD and increment the quantity of a Menu item instance.
+When I click save, the information is saved to __MenuItemInstances.
+3. 

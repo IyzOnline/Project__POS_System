@@ -98,7 +98,7 @@ class App(tk.Tk) :
     searchEntry = ttk.Entry(self.menuSearch, textvariable=self.searchValue, width=60, font=("Helvetica", 14))
     searchEntry.pack(expand=True)
 
-  def searchThroughRecords(self, *args):
+  def searchThroughRecords(self, *args) :
     print("Records Searched!")
 
   def initMenuTableColumns(self) :
@@ -132,7 +132,8 @@ class App(tk.Tk) :
         self.empty.destroy()
     
     for index, (recordName, recordValues) in enumerate(self.__MenuItemRecords.items()):
-      print(recordValues)
+      #print(recordValues)
+      #print(f"Here are all the saved item quantities: {self.__SavedItemQuantity}")
       if recordName in self.__SavedItemQuantity :
         updatedQuantity = self.__SavedItemQuantity[recordName].get()
         item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
@@ -225,10 +226,7 @@ class App(tk.Tk) :
         print("Horray!")
         if value[3] == 0:
           print("destruction of instance")
-          self.__ReceiptListInstances[key][4].destroy()
-
-          self.total.set(self.total.get() - (self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]))
-          
+          self.__ReceiptListInstances[key][4].destroy()          
           del self.__ReceiptListInstances[key]
           deletionKey = key
         elif self.__ReceiptListInstances[key][3] == value[3] :
@@ -236,12 +234,7 @@ class App(tk.Tk) :
           print(self.__ReceiptListInstances[key])
         else :
           print("not equal")
-
-          self.total.set(self.total.get() - (self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]))
-
           self.__ReceiptListInstances[key] = value + (self.__ReceiptListInstances[key][4],)
-
-          self.total.set(self.total.get() + (self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]))
 
           savedQuantityLbl = self.__ReceiptListInstances[key][4].nametowidget("quantityLbl")
           savedSumLbl = self.__ReceiptListInstances[key][4].nametowidget("sumLbl")
@@ -249,14 +242,14 @@ class App(tk.Tk) :
           savedQuantityLbl.config(text=value[3])
           savedSumLbl.config(text=value[1]*value[3])
       else :
+        print("Printing Deluxe")
+        print(f"Here is the SavedItemQuantity of {value[0]}: {self.__SavedItemQuantity[value[0]].get()}")
         orderItemFrame = ttk.Frame(self.orderListFrame)
         self.__ReceiptListInstances[key] = value + (orderItemFrame,)
 
         quantityLbl = ttk.Label(orderItemFrame, text=value[3], style="Cell.TLabel", anchor="center", name="quantityLbl")
         nameLbl = ttk.Label(orderItemFrame, text=value[0], style="Cell.TLabel", anchor="center", name="nameLbl")
         sumLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], style="Cell.TLabel", anchor="center", name="sumLbl")
-
-        self.total.set(self.total.get() + (self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]))
 
         orderItemFrame.grid_columnconfigure(0, weight=1)
         orderItemFrame.grid_columnconfigure(1, weight=1)
@@ -271,7 +264,17 @@ class App(tk.Tk) :
     if (deletionKey) :
       del self.__MenuItemInstances[deletionKey]
 
-  def initTotal(self, parent):
+    self.updateTotal()
+
+  def updateTotal(self):
+    self.total.set(0)
+    
+    for key, values in self.__MenuItemInstances.items():
+      amountToAdd = values[1] * values[3]
+      print(f"This is the amount to add of {values[0]}: {amountToAdd}")
+      self.total.set(self.total.get() + amountToAdd)
+  
+  def initTotal(self, parent) :
     totalFrame = ttk.Frame(parent)
     totalTxtLbl = ttk.Label(totalFrame, text="Total:", anchor="center")
     totalSumLbl = ttk.Label(totalFrame, textvariable=self.total, anchor="center")
@@ -285,7 +288,7 @@ class App(tk.Tk) :
     totalFrame.pack(fill="x")
 
   #Checkout Page
-  def goToCheckout(self):
+  def goToCheckout(self) :
     if not self.__MenuItemInstances:
       print("You must order something first.")
       return
@@ -318,8 +321,6 @@ class App(tk.Tk) :
 
     returnBtn.pack()
     saveBtn.pack()
-
-    
 
 #storage implementation
   def initDB(self) :
