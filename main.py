@@ -508,6 +508,7 @@ class Order() :
     self.__conn = conn
     self.__cursor = cursor
     self.commitDBChanges = commitDBChanges
+    self.clearAllInstances = clearAllInstances
 
     results = self.__cursor.execute("SELECT * FROM orders ORDER BY date DESC")
     latestResult = results.fetchone()
@@ -524,14 +525,14 @@ class Order() :
     dateTimeOrder = datetime.datetime.now().isoformat()
     self.__cursor.execute("INSERT INTO orders (date) VALUES (?)", (dateTimeOrder,))
 
-    self.commitDBChanges("Inserted date-time of current order to DB.")
+    self.commitDBChanges("Saved date-time of current order to orders table in DB.")
 
     for key, value in self.__ItemsInOrder.items():
       self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?, ?, ?)", (self.orderNum, *value))
 
-    self.commitDBChanges("Inserted item rows inside of order_items table in DB.")
+    self.commitDBChanges("Saved items in receipt to order_items table in DB.")
 
-    self.__ItemsInOrder.clear()
+    self.clearAllInstances()
 
   def reduceFromOrder(self, itemName):
     pass
