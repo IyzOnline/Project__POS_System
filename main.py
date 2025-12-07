@@ -458,12 +458,8 @@ class Order() :
 
     self.commitDBChanges("Inserted date-time of current order to DB.")
 
-    results = self.__cursor.execute("SELECT * FROM orders WHERE date = ?", (dateTimeOrder,))
-    row = results.fetchone()
-    orderID = row[0]
-
     for key, value in self.__ItemsInOrder.items():
-      self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?)", (orderID, *value))
+      self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?)", (self.orderNum, *value))
 
     self.commitDBChanges("Inserted item rows inside of order_items table in DB.")
 

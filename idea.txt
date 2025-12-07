@@ -1,0 +1,32 @@
+""" for Updating Receipt Area
+    for key, value in self.__MenuItemInstances.items() :
+      if key in self.__ReceiptListInstances :
+        if self.__MenuItemInstances[key][3] == value[3] :
+          continue
+        else :
+          self.__ReceiptListInstances[key][3] = value[3]
+          savedQuantityLbl = self.__ReceiptListInstances[key][4].nametowidget("quantityLbl")
+          savedSumLbl = self.__ReceiptListInstances[key][4].nametowidget("sumLbl")
+
+          savedQuantityLbl.config(text=value[3])
+          savedSumLbl.config(text=value[1]*value[3])
+      else :
+        orderItemFrame = ttk.Frame(self.orderListFrame)
+        self.__ReceiptListInstances[key] = value + (orderItemFrame,)
+
+        quantityLbl = ttk.Label(orderItemFrame, text=value[3], style="Cell.TLabel", anchor="center", name="quantityLbl")
+        nameLbl = ttk.Label(orderItemFrame, text=value[0], style="Cell.TLabel", anchor="center", name="nameLbl")
+        sumLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], style="Cell.TLabel", anchor="center", name="sumLbl")
+
+        self.total += value[1]*value[3]
+
+        orderItemFrame.grid_columnconfigure(0, weight=1)
+        orderItemFrame.grid_columnconfigure(1, weight=1)
+        orderItemFrame.grid_columnconfigure(2, weight=1)
+
+        quantityLbl.grid(column=0, row=0, sticky="nsew")
+        nameLbl.grid(column=1, row=0, sticky="nsew")
+        sumLbl.grid(column=2, row=0, sticky="nsew")
+
+        orderItemFrame.pack(fill="x")
+"""
