@@ -13,6 +13,8 @@ class App(tk.Tk) :
 
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
+    self.__MenuClassInstances = {}
+    self.__ReceiptListInstances = {}
 
     self.initStyles()
     self.initializeExitFS()
@@ -125,10 +127,16 @@ class App(tk.Tk) :
     else :
       if (self.empty) :
         self.empty.destroy()
-
+    
     for index, (recordName, recordValues) in enumerate(self.__MenuItemRecords.items()):
       print(recordValues)
-      item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea)
+      if recordName in self.__MenuClassInstances :
+        updatedQuantity = self.__MenuClassInstances[recordName].get()
+        item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
+      else :
+        item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, 0)
+      
+      self.__MenuClassInstances[recordName] = item.quantity
       item.pack(fill="x")
 
   def createMenuItem(self) :
@@ -170,6 +178,7 @@ class App(tk.Tk) :
 
   def returnToHome(self, currentFrame) :
     currentFrame.pack_forget()
+    self.clearReceiptInstances()
     self.initializeHomePage()
 
   def editMenuItem(self) :
@@ -200,31 +209,55 @@ class App(tk.Tk) :
     checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=order.saveOrderToDB)
     checkoutBtn.pack()
   
-  def updateReceiptArea(self):
+  def updateReceiptArea(self) :
     self.total = 0
-    print(f"Here is the menu item instances: {self.__MenuItemInstances}")
+    print(f"Here are the menu item instances: {self.__MenuItemInstances}")
     if not self.__MenuItemInstances:
       print(f"No items in order yet.")
 
-    for key, value in self.__MenuItemInstances.items():
-      orderItemFrame = ttk.Frame(self.orderListFrame)
+    for key, value in self.__MenuItemInstances.items() :
+      if key in self.__ReceiptListInstances :
+        print("Horray!")
+        if self.__ReceiptListInstances[key][3] == value[3] :
+          print("equal")
+          print(self.__ReceiptListInstances)
+          continue
+        else :
+          print("not equal")
+          self.total -= self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]
 
-      quantityLbl = ttk.Label(orderItemFrame, text=value[3], style="Cell.TLabel", anchor="center")
-      nameLbl = ttk.Label(orderItemFrame, text=value[0], style="Cell.TLabel", anchor="center")
-      sumLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], style="Cell.TLabel", anchor="center")
+          self.__ReceiptListInstances[key] = value + (self.__ReceiptListInstances[key][4],)
+          print("Quantity: " + str(self.__ReceiptListInstances[key][3]))
+    
+          self.total += self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]
 
-      self.total += value[1]*value[3]
+          savedQuantityLbl = self.__ReceiptListInstances[key][4].nametowidget("quantityLbl")
+          savedSumLbl = self.__ReceiptListInstances[key][4].nametowidget("sumLbl")
 
-      orderItemFrame.grid_columnconfigure(0, weight=1)
-      orderItemFrame.grid_columnconfigure(1, weight=1)
-      orderItemFrame.grid_columnconfigure(2, weight=1)
+          savedQuantityLbl.config(text=value[3])
+          savedSumLbl.config(text=value[1]*value[3])
+      else :
+        orderItemFrame = ttk.Frame(self.orderListFrame)
+        self.__ReceiptListInstances[key] = value + (orderItemFrame,)
 
-      quantityLbl.grid(column=0, row=0, sticky="nsew")
-      nameLbl.grid(column=1, row=0, sticky="nsew")
-      sumLbl.grid(column=2, row=0, sticky="nsew")
+        quantityLbl = ttk.Label(orderItemFrame, text=value[3], style="Cell.TLabel", anchor="center", name="quantityLbl")
+        nameLbl = ttk.Label(orderItemFrame, text=value[0], style="Cell.TLabel", anchor="center", name="nameLbl")
+        sumLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], style="Cell.TLabel", anchor="center", name="sumLbl")
 
-      orderItemFrame.pack(fill="x")
+        self.total += value[1]*value[3]
 
+        orderItemFrame.grid_columnconfigure(0, weight=1)
+        orderItemFrame.grid_columnconfigure(1, weight=1)
+        orderItemFrame.grid_columnconfigure(2, weight=1)
+
+        quantityLbl.grid(column=0, row=0, sticky="nsew")
+        nameLbl.grid(column=1, row=0, sticky="nsew")
+        sumLbl.grid(column=2, row=0, sticky="nsew")
+
+        orderItemFrame.pack(fill="x")
+
+  def clearReceiptInstances(self) :
+    self.__ReceiptListInstances = {}
 
 #storage implementation
   def initDB(self) :
@@ -323,7 +356,7 @@ class App(tk.Tk) :
       print(f"Name: {row[1]}")
 
 class MenuItem(tk.Frame) :
-  def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea) :
+  def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
     self.__MenuItemInstances = MenuItemInstances
     self.updateReceiptArea = updateReceiptArea
     super().__init__(parent)
@@ -333,7 +366,8 @@ class MenuItem(tk.Frame) :
     self.__name = tk.StringVar(value=MenuItemRecord['name'])
     self.__price = tk.IntVar(value=MenuItemRecord['price'])
     self.__category = tk.StringVar(value=MenuItemRecord['category'])
-    self.__quantity = tk.IntVar()
+
+    self.__quantity = tk.IntVar(value=initQuantity)
 
     self.nameLbl = ttk.Label(self, textvariable=self.__name, style="Cell.TLabel")
     self.priceLbl = ttk.Label(self, textvariable=self.__price, style="Cell.TLabel")
@@ -350,7 +384,11 @@ class MenuItem(tk.Frame) :
     self.categoryLbl.grid(column=2, row=0, sticky="nsew")
     self.addToOrderBtn.grid(column=3, row=0, sticky="nsew")
 
-    print("---\n\nd: Menu Item row creation was successful.\n\n---")
+    print("---d: Menu Item row creation was successful.---")
+
+  @property
+  def quantity(self):
+    return self.__quantity
 
   def initStyles(self) :
     self.style = ttk.Style()
@@ -420,7 +458,7 @@ class MenuItem(tk.Frame) :
     
   def decreaseQuantity(self, event=None) :
     currentQuantity = self.__quantity.get()
-    if currentQuantity > 0 :
+    if currentQuantity > -1 :
       self.__quantity.set(currentQuantity - 1)
       print(f"Quantity decreased to {currentQuantity - 1}")
     else:
