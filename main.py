@@ -3,6 +3,7 @@ from tkinter import ttk
 import sqlite3
 from pathlib import Path
 import sys
+import datetime
 
 class App(tk.Tk):
   def __init__(self):
@@ -210,7 +211,9 @@ class App(tk.Tk):
                           CREATE TABLE IF NOT EXISTS order_items (
                             itemID INTEGER PRIMARY KEY AUTOINCREMENT, 
                             orderID INTEGER,
-                            name TEXT,
+                            name TEXT NOT NULL,
+                            price INTEGER NOT NULL,
+                            category TEXT NOT NULL 
                             quantity INTEGER,
                             FOREIGN KEY(orderID) REFERENCES orders(orderID)
                           )
@@ -229,12 +232,12 @@ class App(tk.Tk):
         sys.exit(1)
 
   def initMenuItemsfromDB(self) :
-      rows = self.__cursor.execute("SELECT * FROM menu_items")
-      results = rows.fetchall()
+      results = self.__cursor.execute("SELECT * FROM menu_items")
+      rows = results.fetchall()
 
       print("Initializing Menu Items...")
-      if len(results):
-        for row in results:
+      if len(rows):
+        for row in rows:
           MenuItemRecord = {
             "name": row[1],
             "price": row[2],
@@ -397,7 +400,17 @@ class Order():
     self.commitDBChanges = commitDBChanges
 
   def saveOrderToDB(self) :
-    pass
+    dateTimeOrder = datetime.datetime.now().isoformat()
+    self.__cursor.execute("INSERT INTO orders (date) VALUES (?)", (dateTimeOrder,))
+
+    self.commitDBChanges("Inserted date-time of current order to DB.")
+
+    results = self.__cursor.execute("SELECT * FROM orders WHERE date = ?", (dateTimeOrder,))
+    row = results.fetchone()
+    orderID = row[0]
+
+    for key, value in self.__listOfOrders.items():
+      self.__cursor.execute("INSERT INTO menu_items (orderID, name, price, category) VALUES (?, ?, ?)", (orderID, *value))
 
   def reduceFromOrder(self, itemName):
     pass
