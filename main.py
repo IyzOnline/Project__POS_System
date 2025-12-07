@@ -13,7 +13,7 @@ class App(tk.Tk) :
 
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
-    self.__MenuClassInstances = {}
+    self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
 
     self.initStyles()
@@ -130,13 +130,13 @@ class App(tk.Tk) :
     
     for index, (recordName, recordValues) in enumerate(self.__MenuItemRecords.items()):
       print(recordValues)
-      if recordName in self.__MenuClassInstances :
-        updatedQuantity = self.__MenuClassInstances[recordName].get()
+      if recordName in self.__SavedItemQuantity :
+        updatedQuantity = self.__SavedItemQuantity[recordName].get()
         item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
       else :
         item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, 0)
       
-      self.__MenuClassInstances[recordName] = item.quantity
+      self.__SavedItemQuantity[recordName] = item.quantity
       item.pack(fill="x")
 
   def createMenuItem(self) :
@@ -443,7 +443,7 @@ class MenuItem(tk.Frame) :
     print("d: Buttons for PopUp Frame packed.")
 
   def addToOrder(self, event=None) :
-    if self.__quantity.get() < 1 :
+    if self.__quantity.get() == 0 :
       print("Quantity cannot be zero")
     else:
       name = self.__name.get()
@@ -458,7 +458,7 @@ class MenuItem(tk.Frame) :
     
   def decreaseQuantity(self, event=None) :
     currentQuantity = self.__quantity.get()
-    if currentQuantity > -1 :
+    if currentQuantity > 0 :
       self.__quantity.set(currentQuantity - 1)
       print(f"Quantity decreased to {currentQuantity - 1}")
     else:
