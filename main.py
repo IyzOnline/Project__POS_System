@@ -16,6 +16,7 @@ class App(tk.Tk):
     self.initStyles()
     self.initializeExitFS()
     self.initDB()
+    order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
     self.initializeHomePage()
 
 #UI Implementation
@@ -323,7 +324,7 @@ class MenuItem(tk.Frame) :
                     bg="lightgray"
                     )
 
-  def addItemPopUp(self, parent):
+  def addItemPopUp(self, parent) :
     self.popUp = tk.Frame(parent, bd=2, relief="raised")
 
     popNameLbl = ttk.Label(self.popUp, textvariable=self.__name)
@@ -339,7 +340,7 @@ class MenuItem(tk.Frame) :
     self.popUp.lift()
     self.increaseBtn.focus_set()
 
-  def createBtns(self):
+  def createBtns(self) :
     self.btnFrame = tk.Frame(self.popUp)
     quantityLbl = ttk.Label(self.btnFrame, textvariable=self.__quantity)
     self.increaseBtn = ttk.Button(self.btnFrame, text="+", command=self.increaseQuantity)
@@ -359,44 +360,43 @@ class MenuItem(tk.Frame) :
 
     print("d: Buttons for PopUp Frame packed.")
 
-  def addToOrder(self, event=None):
-    if self.__quantity.get() < 1:
+  def addToOrder(self, event=None) :
+    if self.__quantity.get() < 1 :
       print("Quantity cannot be zero")
     else:
       name = self.__name.get()
       price = self.__price.get()
+      category = self.__category.get()
       quantity = self.__quantity.get()
       
-      self.__MenuItemInstances[name] = {
-        "name": name,
-        "price": price,
-        "quantity": quantity
-      }
+      self.__MenuItemInstances[name] = (name, price, category, quantity)
 
       self.popUp.destroy()
-
     
-  def decreaseQuantity(self, event=None):
+  def decreaseQuantity(self, event=None) :
     currentQuantity = self.__quantity.get()
-    if currentQuantity > 0:
+    if currentQuantity > 0 :
       self.__quantity.set(currentQuantity - 1)
       print(f"Quantity decreased to {currentQuantity - 1}")
     else:
       print(f"Quantity is already {currentQuantity}")
       
-  def increaseQuantity(self, event=None):
+  def increaseQuantity(self, event=None) :
     currentQuantity = self.__quantity.get()
-    if currentQuantity < 10:
+    if currentQuantity < 10 :
       self.__quantity.set(currentQuantity + 1)
       print(f"Quantity increased to {currentQuantity + 1}")
     else:
       print(f"Quantity is already at max -> {currentQuantity}")
 
 class Order():
-  def __init__(self):
-    self.__listOfOrders = {}
+  def __init__(self, MenuItemInstances, conn, cursor, commitDBChanges) :
+    self.__listOfOrders = MenuItemInstances
+    self.__conn = conn
+    self.__cursor = cursor
+    self.commitDBChanges = commitDBChanges
 
-  def addToOrder(self, itemName):
+  def saveOrderToDB(self) :
     pass
 
   def reduceFromOrder(self, itemName):
@@ -406,9 +406,6 @@ class Order():
     pass
 
   def deleteEntireOrder(self):
-    pass
-
-  def checkoutOrder(self):
     pass
 
   def cancelOrder(self):
