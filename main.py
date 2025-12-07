@@ -410,7 +410,11 @@ class Order():
     orderID = row[0]
 
     for key, value in self.__listOfOrders.items():
-      self.__cursor.execute("INSERT INTO menu_items (orderID, name, price, category) VALUES (?, ?, ?)", (orderID, *value))
+      self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?)", (orderID, *value))
+
+    self.commitDBChanges("Inserted item rows inside of order_items table in DB.")
+
+    self.__listOfOrders.clear()
 
   def reduceFromOrder(self, itemName):
     pass
