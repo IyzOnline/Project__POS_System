@@ -19,6 +19,7 @@ class App(tk.Tk) :
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
+    self.__OrderRecords = {}
     self.total = tk.DoubleVar(value=0)
     self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
 
@@ -82,7 +83,12 @@ class App(tk.Tk) :
 
   #History Page
   def initHistoryPage(self) :
-    pass
+    historyPageFrame = tk.Frame(self.mainFrame, padx=10, pady=10, background="#ffffff")
+    historyPageFrame.pack()
+    self.
+
+  def displayHistoryTable(self):
+
 
   #Sidebar
   def initializeSidebar(self) :
@@ -384,6 +390,7 @@ class App(tk.Tk) :
         self.__conn.rollback()
         sys.exit(1)
 
+  #Menu Items
   def initMenuItemsfromDB(self) :
       results = self.__cursor.execute("SELECT * FROM menu_items")
       rows = results.fetchall()
@@ -447,6 +454,27 @@ class App(tk.Tk) :
   def clearReceiptInstances(self) :
     self.__ReceiptListInstances = {}
 
+  #History Page DB Functionality
+  def reqForOrderHistory(self) :
+    orders = self.__cursor.execute("SELECT * FROM orders")
+    
+    for order in orders :
+      self.__OrderRecords[order[0]] = {
+        "orderID": order[0], 
+        "date": datetime.fromisoformat(order[1]),
+        "items": {}
+      }
+
+      itemsInOrder = self.__cursor.execute("SELECT * FROM order_items WHERE orderID = ?", (order[0],))
+
+      for item in itemsInOrder:
+        self.__OrderRecords[order[0]]["items"][item[2]] = {
+          "name": item[2],
+          "price": item[3],
+          "category": item[4],
+          "quantity": item[5]
+        }
+
   def resetForNewOrder(self) :
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
@@ -456,6 +484,7 @@ class App(tk.Tk) :
     self.mainFrame.destroy()
     self.initializeMainFrame()
     self.initCashierMode()
+
 
 class MenuItem(tk.Frame) :
   def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
