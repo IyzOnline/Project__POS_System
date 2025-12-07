@@ -16,7 +16,7 @@ class App(tk.Tk) :
     self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
     self.total = tk.DoubleVar(value=0)
-    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.clearAllInstances)
+    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
 
     self.initStyles()
     self.initializeExitFS()
@@ -379,12 +379,14 @@ class App(tk.Tk) :
   def clearReceiptInstances(self) :
     self.__ReceiptListInstances = {}
 
-  def clearAllInstances(self) :
+  def resetForNewOrder(self) :
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
     self.total = tk.DoubleVar(value=0)
-    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.clearAllInstances)
+    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
+    self.homeFrame.destroy()
+    self.initializeHomePage()
 
 class MenuItem(tk.Frame) :
   def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
