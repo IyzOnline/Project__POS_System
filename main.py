@@ -13,22 +13,36 @@ class App(tk.Tk):
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
 
+    self.initStyles()
     self.initializeExitFS()
     self.initDB()
     self.initializeHomePage()
 
 #UI Implementation
-  def initializeExitFS(self):
+  def initStyles(self) :
+    self.style = ttk.Style()
+    self.style.configure("Cell.TLabel",
+                    width=50,
+                    relief="solid", 
+                    borderwidth=2, 
+                    bg="lightgray",
+                    )
+    
+    self.style.configure("Cell.TButton",
+                    relief="solid", 
+                    width=50,
+                    borderwidth=2, 
+                    bg="lightgray"
+                    )
+
+  def initializeExitFS(self) :
     self.attributes('-fullscreen', True)
     self.bind('<Escape>', self.exit_fullscreen)
 
-  def exit_fullscreen(self, event=None):
+  def exit_fullscreen(self, event=None) :
     self.attributes('-fullscreen', False)
-  
-  def initializeStyleObjects(self):
-    pass
 
-  def initializeHomePage(self):
+  def initializeHomePage(self) :
     self.homeFrame = tk.Frame(self, bg="#ffffff")
     self.homeFrame.pack(expand=True, fill="both", padx=20, pady=20)
 
@@ -43,7 +57,7 @@ class App(tk.Tk):
     self.initializeMenuArea()
 
   #Menu
-  def initializeMenuArea(self):
+  def initializeMenuArea(self) :
     self.menuSearch = tk.Frame(self.menuFrame, bg="#8049df")
     self.menuTable = tk.Frame(self.menuFrame, bg="#df4949")
     self.menuLowerBtns = tk.Frame(self.menuFrame, bg="#448743")
@@ -60,10 +74,11 @@ class App(tk.Tk):
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
     editBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
+    self.initColumns()
     self.initializeMenuItems()
     self.initializeSearchArea()
 
-  def initializeSearchArea(self):
+  def initializeSearchArea(self) :
     self.searchValue = tk.StringVar()
     self.searchValue.trace_add("write", self.searchThroughRecords)
     searchEntry = ttk.Entry(self.menuSearch, textvariable=self.searchValue, width=60, font=("Helvetica", 14))
@@ -72,11 +87,32 @@ class App(tk.Tk):
   def searchThroughRecords(self, *args):
     print("Records Searched!")
 
+  def initColumns(self) :
+    columns = tk.Frame(self.menuTable)
+    
+    nameCol = ttk.Label(columns, text="Name", style="Cell.TLabel", anchor="center")
+    priceCol = ttk.Label(columns, text="Price", style="Cell.TLabel", anchor="center")
+    categoryCol = ttk.Label(columns, text="Category", style="Cell.TLabel", anchor="center")
+    addCol = ttk.Label(columns, text="Add to Order", style="Cell.TButton", anchor="center")
+
+    columns.grid_columnconfigure(0, weight=1)
+    columns.grid_columnconfigure(1, weight=1)
+    columns.grid_columnconfigure(2, weight=1)
+    columns.grid_columnconfigure(3, weight=1)
+
+    nameCol.grid(column=0, row=0, sticky="nsew")
+    priceCol.grid(column=1, row=0, sticky="nsew")
+    categoryCol.grid(column=2, row=0, sticky="nsew")
+    addCol.grid(column=3, row=0, sticky="nsew")
+    
+    columns.pack()
+
   def initializeMenuItems(self) :
+    self.empty = None
     if (len(self.__MenuItemRecords) == 0):
-      self.empty = tk.Label(self.menuTable, text="No records exist.")
-      self.empty.pack(expand=True, fill="both")
-      self.initMenuItemsfromDB()
+      if not self.initMenuItemsfromDB():
+        self.empty = tk.Label(self.menuTable, text="No records exist.")
+        self.empty.pack(expand=True, fill="both")
     else :
       if (self.empty) :
         self.empty.destroy()
@@ -86,7 +122,7 @@ class App(tk.Tk):
       item = MenuItem(self.menuTable, recordValues)
       item.pack(fill="x")
 
-  def createMenuItem(self):
+  def createMenuItem(self) :
     self.homeFrame.pack_forget()
 
     def passData():
@@ -123,32 +159,32 @@ class App(tk.Tk):
     returnBtn.pack()
     saveBtn.pack()
 
-  def returnToHome(self, currentFrame):
+  def returnToHome(self, currentFrame) :
     currentFrame.pack_forget()
     self.initializeHomePage()
 
-  def editMenuItem(self):
+  def editMenuItem(self) :
     pass
 
-  def deleteMenuItem(self):
+  def deleteMenuItem(self) :
     pass 
 
   #Sidebar
-  def initializeSidebar_Proto(self):
+  def initializeSidebar_Proto(self) :
     pass
 
-  def initializeSidebar(self):
+  def initializeSidebar(self) :
     pass
 
   #Receipt
-  def initializeReceipt_Proto(self):
+  def initializeReceipt_Proto(self) :
     pass
 
-  def initializeReceipt(self):
+  def initializeReceipt(self) :
     pass
 
 #storage implementation
-  def initDB(self):
+  def initDB(self) :
     self.__conn = sqlite3.connect(Path("db")/"menuitems.db")
     self.__cursor = self.__conn.cursor()
 
@@ -180,7 +216,7 @@ class App(tk.Tk):
     
     self.commitDBChanges("d: menu_items table saved in DB")
 
-  def commitDBChanges(self, descrip):
+  def commitDBChanges(self, descrip) :
       try:
         self.__conn.commit()
         print(descrip)
@@ -190,23 +226,27 @@ class App(tk.Tk):
         self.__conn.rollback()
         sys.exit(1)
 
-  def initMenuItemsfromDB(self):
+  def initMenuItemsfromDB(self) :
       rows = self.__cursor.execute("SELECT * FROM menu_items")
+      results = rows.fetchall()
 
       print("Initializing Menu Items...")
-      for row in rows:
-        MenuItemRecord = {
-          "name": row[1],
-          "price": row[2],
-          "category": row[3],
-        }
+      if len(results):
+        for row in results:
+          MenuItemRecord = {
+            "name": row[1],
+            "price": row[2],
+            "category": row[3],
+          }
 
-        self.__MenuItemRecords[MenuItemRecord['name']] = MenuItemRecord
-        print(f"Item {row[0]}: {MenuItemRecord['name']}")
+          self.__MenuItemRecords[MenuItemRecord['name']] = MenuItemRecord
+          print(f"Item {row[0]}: {MenuItemRecord['name']}")
+        print("Initialization of Menu Items Complete.")
+        return True
+      else:
+        return False
 
-      print("Initialization of Menu Items Complete.")
-
-  def addMenuItem(self, data):
+  def addMenuItem(self, data) :
     print(f"Here is data in adding: {data}")
     self.__cursor.execute("INSERT INTO menu_items (name, price, category) VALUES (?, ?, ?)", data)
 
@@ -220,25 +260,25 @@ class App(tk.Tk):
 
     self.commitDBChanges("d: prototype data saved to menu_items table in DB")
 
-  def removeMenuItem(self):
+  def removeMenuItem(self) :
     #need to ask for confirmation from user then delete from DB
     self.__cursor.execute("DELETE ")
 
-  def editMenuItem(self):
+  def editMenuItem(self) :
     self.__cursor.execute("UPDATE ")
 
-  def printMenuLength(self):
+  def printMenuLength(self) :
     print(len(self.__MenuItemRecords))
 
-  def displayItemsInConsole(self):
+  def displayItemsInConsole(self) :
     rows = self.__cursor.execute("SELECT * FROM menu_items")
 
     for row in rows:
       print("----\nItems in MenuItemRecord: ")
       print(f"Name: {row[1]}")
 
-class MenuItem(tk.Frame):
-  def __init__(self, parent, MenuItemRecord):
+class MenuItem(tk.Frame) :
+  def __init__(self, parent, MenuItemRecord) :
     super().__init__(parent)
     self.initStyles()
 
@@ -264,7 +304,7 @@ class MenuItem(tk.Frame):
 
     print("---\n\nd: Menu Item row creation was successful.\n\n---")
 
-  def initStyles(self):
+  def initStyles(self) :
     self.style = ttk.Style()
     self.style.configure("Cell.TLabel",
                     width=50,
