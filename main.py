@@ -128,7 +128,7 @@ class App(tk.Tk) :
 
     for index, (recordName, recordValues) in enumerate(self.__MenuItemRecords.items()):
       print(recordValues)
-      item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances)
+      item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea)
       item.pack(fill="x")
 
   def createMenuItem(self) :
@@ -323,8 +323,9 @@ class App(tk.Tk) :
       print(f"Name: {row[1]}")
 
 class MenuItem(tk.Frame) :
-  def __init__(self, parent, MenuItemRecord, count, MenuItemInstances) :
+  def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea) :
     self.__MenuItemInstances = MenuItemInstances
+    self.updateReceiptArea = updateReceiptArea
     super().__init__(parent)
     self.initStyles()
 
@@ -413,7 +414,8 @@ class MenuItem(tk.Frame) :
       quantity = self.__quantity.get()
       
       self.__MenuItemInstances[name] = (name, price, category, quantity)
-
+      self.updateReceiptArea()
+      
       self.popUp.destroy()
     
   def decreaseQuantity(self, event=None) :
