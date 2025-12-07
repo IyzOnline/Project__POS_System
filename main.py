@@ -72,9 +72,15 @@ class App(tk.Tk):
   def searchThroughRecords(self, *args):
     print("Records Searched!")
 
-  def initializeMenuItems(self):
+  def initializeMenuItems(self) :
     if (len(self.__MenuItemRecords) == 0):
+      self.empty = tk.Label(self.menuTable, text="No records exist.")
+      self.empty.pack(expand=True, fill="both")
       self.initMenuItemsfromDB()
+    else :
+      if (self.empty) :
+        self.empty.destroy()
+
     for recordName, recordValues in self.__MenuItemRecords.items():
       print(recordValues)
       item = MenuItem(self.menuTable, recordValues)
@@ -269,6 +275,7 @@ class MenuItem(tk.Frame):
     
     self.style.configure("Cell.TButton",
                     relief="solid", 
+                    width=50,
                     borderwidth=2, 
                     bg="lightgray"
                     )
