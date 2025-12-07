@@ -67,8 +67,19 @@ class App(tk.Tk) :
     self.menuFrame.place(relx=0.1, rely=0, relwidth=0.6, relheight=1.0)
     self.receiptFrame.place(relx=0.72, rely=0, relwidth=0.28, relheight=1.0)
 
+    self.initializeSidebar()
     self.initializeMenuArea()
     self.initializeReceipt()
+
+  #Sidebar
+  def initializeSidebar(self) :
+    cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Mode")
+    kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Mode")
+    historyPageBtn = ttk.Button(self.sidebarFrame, text="History Page")
+
+    cashierPageBtn.pack(padx=5, pady=5)
+    kitchenPageBtn.pack(padx=5, pady=5)
+    historyPageBtn.pack(padx=5, pady=5)
 
   #Menu
   def initializeMenuArea(self) :
@@ -194,13 +205,6 @@ class App(tk.Tk) :
   def deleteMenuItem(self) :
     pass 
 
-  #Sidebar
-  def initializeSidebar_Proto(self) :
-    pass
-
-  def initializeSidebar(self) :
-    pass
-
   #Receipt
   def initializeReceipt(self) :
     orderNumLbl = ttk.Label(self.receiptFrame, text=f"Order {self.order.orderNum}", style="Cell.TLabel", anchor="center")
@@ -321,6 +325,14 @@ class App(tk.Tk) :
 
     returnBtn.pack()
     saveBtn.pack()
+
+  #Kitchen Mode
+  def initKitcheMode(self) :
+    pass
+
+  #History Page
+  def initHistoryPage(self) :
+    pass
 
 #storage implementation
   def initDB(self) :
