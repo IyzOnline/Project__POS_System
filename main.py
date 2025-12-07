@@ -11,6 +11,10 @@ class App(tk.Tk) :
     self.title("POS System")
     self.minsize(960, 540)
 
+    self.initStyles()
+    self.initializeExitFS()
+    self.initDB()
+
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
@@ -18,9 +22,6 @@ class App(tk.Tk) :
     self.total = tk.DoubleVar(value=0)
     self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
 
-    self.initStyles()
-    self.initializeExitFS()
-    self.initDB()
     self.initializeHomePage()
 
 #UI Implementation
@@ -145,6 +146,9 @@ class App(tk.Tk) :
     self.homeFrame.pack_forget()
 
     def passData():
+      if not (nameEntry.get() and priceEntry.get() and categoryEntry.get()):
+        return None
+      
       data = (nameEntry.get(), 
               int(priceEntry.get()), 
               categoryEntry.get()
@@ -179,7 +183,7 @@ class App(tk.Tk) :
     saveBtn.pack()
 
   def returnToHome(self, currentFrame) :
-    currentFrame.pack_forget()
+    currentFrame.destroy()
     self.clearReceiptInstances()
     self.initializeHomePage()
 
@@ -205,9 +209,9 @@ class App(tk.Tk) :
     self.orderListFrame.pack(expand=True, fill="both")
 
     self.updateReceiptArea()
-    self.initTotal()
+    self.initTotal(self.receiptFrame)
 
-    checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=self.order.saveOrderToDB)
+    checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=self.goToCheckout)
     checkoutBtn.pack()
   
   def updateReceiptArea(self) :
@@ -267,8 +271,8 @@ class App(tk.Tk) :
     if (deletionKey) :
       del self.__MenuItemInstances[deletionKey]
 
-  def initTotal(self):
-    totalFrame = ttk.Frame(self.receiptFrame)
+  def initTotal(self, parent):
+    totalFrame = ttk.Frame(parent)
     totalTxtLbl = ttk.Label(totalFrame, text="Total:", anchor="center")
     totalSumLbl = ttk.Label(totalFrame, textvariable=self.total, anchor="center")
     
@@ -279,6 +283,43 @@ class App(tk.Tk) :
     totalSumLbl.grid(column=1, row=0, sticky="nsew")
 
     totalFrame.pack(fill="x")
+
+  #Checkout Page
+  def goToCheckout(self):
+    if not self.__MenuItemInstances:
+      print("You must order something first.")
+      return
+
+    self.homeFrame.pack_forget()
+    checkoutFrame = tk.Frame(self, width=500, height=1000)
+    checkoutFrame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+    for key, value in self.__MenuItemInstances.items() :
+      orderItemFrame = ttk.Frame(checkoutFrame)
+
+      quantityLbl = ttk.Label(orderItemFrame, text=value[3], anchor="center", name="quantityLbl")
+      nameLbl = ttk.Label(orderItemFrame, text=value[0], anchor="center", name="nameLbl")
+      sumLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], anchor="center", name="sumLbl")
+
+      orderItemFrame.grid_columnconfigure(0, weight=1)
+      orderItemFrame.grid_columnconfigure(1, weight=1)
+      orderItemFrame.grid_columnconfigure(2, weight=1)
+
+      quantityLbl.grid(column=0, row=0, sticky="nsew")
+      nameLbl.grid(column=1, row=0, sticky="nsew")
+      sumLbl.grid(column=2, row=0, sticky="nsew")
+
+      orderItemFrame.pack(fill="x")
+    
+    self.initTotal(checkoutFrame)
+
+    returnBtn = ttk.Button(checkoutFrame, text="Return to Order", command=lambda: self.returnToHome(checkoutFrame))
+    saveBtn = ttk.Button(checkoutFrame, text="Place Order", command=self.order.saveOrderToDB)
+
+    returnBtn.pack()
+    saveBtn.pack()
+
+    
 
 #storage implementation
   def initDB(self) :
@@ -346,6 +387,15 @@ class App(tk.Tk) :
         return False
 
   def addMenuItem(self, data) :
+    #
+    #
+    #Implement PopUp for if not data:
+    #
+    #
+    if not data:
+      print("Fields cannot be empty.")
+      return
+    
     print(f"Here is data in adding: {data}")
     self.__cursor.execute("INSERT INTO menu_items (name, price, category) VALUES (?, ?, ?)", data)
 
