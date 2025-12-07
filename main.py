@@ -16,7 +16,7 @@ class App(tk.Tk) :
     self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
     self.total = tk.DoubleVar(value=0)
-    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
+    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.clearAllInstances)
 
     self.initStyles()
     self.initializeExitFS()
@@ -384,7 +384,7 @@ class App(tk.Tk) :
     self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
     self.total = tk.DoubleVar(value=0)
-    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
+    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.clearAllInstances)
 
 class MenuItem(tk.Frame) :
   def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
@@ -503,7 +503,7 @@ class MenuItem(tk.Frame) :
       print(f"Quantity is already at max -> {currentQuantity}")
 
 class Order() :
-  def __init__(self, MenuItemInstances, conn, cursor, commitDBChanges) :
+  def __init__(self, MenuItemInstances, conn, cursor, commitDBChanges, clearAllInstances) :
     self.__ItemsInOrder = MenuItemInstances
     self.__conn = conn
     self.__cursor = cursor
@@ -527,7 +527,7 @@ class Order() :
     self.commitDBChanges("Inserted date-time of current order to DB.")
 
     for key, value in self.__ItemsInOrder.items():
-      self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?)", (self.orderNum, *value))
+      self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?, ?, ?)", (self.orderNum, *value))
 
     self.commitDBChanges("Inserted item rows inside of order_items table in DB.")
 
