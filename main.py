@@ -234,25 +234,12 @@ class App(tk.Tk):
 class MenuItem(tk.Frame):
   def __init__(self, parent, MenuItemRecord):
     super().__init__(parent)
+    self.initStyles()
 
     self.__name = tk.StringVar(value=MenuItemRecord['name'])
     self.__price = tk.IntVar(value=MenuItemRecord['price'])
     self.__category = tk.StringVar(value=MenuItemRecord['category'])
     self.quantity = tk.IntVar()
-
-    style = ttk.Style()
-    style.configure("Cell.TLabel",
-                    width=50,
-                    relief="solid", 
-                    borderwidth=2, 
-                    bg="lightgray"
-                    )
-    
-    style.configure("Cell.TButton",
-                    relief="solid", 
-                    borderwidth=2, 
-                    bg="lightgray"
-                    )
 
     self.nameLbl = ttk.Label(self, textvariable=self.__name, style="Cell.TLabel")
     self.priceLbl = ttk.Label(self, textvariable=self.__price, style="Cell.TLabel")
@@ -270,6 +257,21 @@ class MenuItem(tk.Frame):
     self.addToOrderBtn.grid(column=3, row=0, sticky="nsew")
 
     print("---\n\nd: Menu Item row creation was successful.\n\n---")
+
+  def initStyles(self):
+    self.style = ttk.Style()
+    self.style.configure("Cell.TLabel",
+                    width=50,
+                    relief="solid", 
+                    borderwidth=2, 
+                    bg="lightgray"
+                    )
+    
+    self.style.configure("Cell.TButton",
+                    relief="solid", 
+                    borderwidth=2, 
+                    bg="lightgray"
+                    )
 
   def addItemPopUp(self, parent):
     self.popUp = tk.Frame(parent, bd=2, relief="raised")
