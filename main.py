@@ -32,7 +32,8 @@ class App(tk.Tk):
                     relief="solid", 
                     width=50,
                     borderwidth=2, 
-                    bg="lightgray"
+                    bg="lightgray",
+                    bordercolor = "red"
                     )
 
   def initializeExitFS(self) :
@@ -117,9 +118,9 @@ class App(tk.Tk):
       if (self.empty) :
         self.empty.destroy()
 
-    for recordName, recordValues in self.__MenuItemRecords.items():
+    for index, (recordName, recordValues) in enumerate(self.__MenuItemRecords.items()):
       print(recordValues)
-      item = MenuItem(self.menuTable, recordValues)
+      item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances)
       item.pack(fill="x")
 
   def createMenuItem(self) :
@@ -278,14 +279,16 @@ class App(tk.Tk):
       print(f"Name: {row[1]}")
 
 class MenuItem(tk.Frame) :
-  def __init__(self, parent, MenuItemRecord) :
+  def __init__(self, parent, MenuItemRecord, count, MenuItemInstances) :
+    self.__MenuItemInstances = MenuItemInstances
     super().__init__(parent)
     self.initStyles()
 
+    print(f"Count: " + str(count))
     self.__name = tk.StringVar(value=MenuItemRecord['name'])
     self.__price = tk.IntVar(value=MenuItemRecord['price'])
     self.__category = tk.StringVar(value=MenuItemRecord['category'])
-    self.quantity = tk.IntVar()
+    self.__quantity = tk.IntVar()
 
     self.nameLbl = ttk.Label(self, textvariable=self.__name, style="Cell.TLabel")
     self.priceLbl = ttk.Label(self, textvariable=self.__price, style="Cell.TLabel")
@@ -338,7 +341,7 @@ class MenuItem(tk.Frame) :
 
   def createBtns(self):
     self.btnFrame = tk.Frame(self.popUp)
-    quantityLbl = ttk.Label(self.btnFrame, textvariable=self.quantity)
+    quantityLbl = ttk.Label(self.btnFrame, textvariable=self.__quantity)
     self.increaseBtn = ttk.Button(self.btnFrame, text="+", command=self.increaseQuantity)
     self.decreaseBtn = ttk.Button(self.btnFrame, text="-", command=self.decreaseQuantity)
     self.finalAddBtn = ttk.Button(self.popUp, text="save", command=self.addToOrder)
@@ -357,24 +360,34 @@ class MenuItem(tk.Frame) :
     print("d: Buttons for PopUp Frame packed.")
 
   def addToOrder(self, event=None):
-    if self.quantity.get() < 1:
+    if self.__quantity.get() < 1:
       print("Quantity cannot be zero")
     else:
+      name = self.__name.get()
+      price = self.__price.get()
+      quantity = self.__quantity.get()
+      
+      self.__MenuItemInstances[name] = {
+        "name": name,
+        "price": price,
+        "quantity": quantity
+      }
+
       self.popUp.destroy()
-      print("====\nAdded to order!\n====")
+
     
   def decreaseQuantity(self, event=None):
-    currentQuantity = self.quantity.get()
+    currentQuantity = self.__quantity.get()
     if currentQuantity > 0:
-      self.quantity.set(currentQuantity - 1)
+      self.__quantity.set(currentQuantity - 1)
       print(f"Quantity decreased to {currentQuantity - 1}")
     else:
       print(f"Quantity is already {currentQuantity}")
       
   def increaseQuantity(self, event=None):
-    currentQuantity = self.quantity.get()
+    currentQuantity = self.__quantity.get()
     if currentQuantity < 10:
-      self.quantity.set(currentQuantity + 1)
+      self.__quantity.set(currentQuantity + 1)
       print(f"Quantity increased to {currentQuantity + 1}")
     else:
       print(f"Quantity is already at max -> {currentQuantity}")
