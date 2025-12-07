@@ -240,15 +240,34 @@ class MenuItem(tk.Frame):
     self.__category = tk.StringVar(value=MenuItemRecord['category'])
     self.quantity = tk.IntVar()
 
-    self.nameLbl = tk.Label(self, textvariable=self.__name)
-    self.priceLbl = tk.Label(self, textvariable=self.__price)
-    self.categoryLbl = tk.Label(self, textvariable=self.__category)
-    self.addToOrderBtn = ttk.Button(self, text="ADD", command=lambda: self.addItemPopUp(parent))
+    style = ttk.Style()
+    style.configure("Cell.TLabel",
+                    width=50,
+                    relief="solid", 
+                    borderwidth=2, 
+                    bg="lightgray"
+                    )
+    
+    style.configure("Cell.TButton",
+                    relief="solid", 
+                    borderwidth=2, 
+                    bg="lightgray"
+                    )
 
-    self.nameLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    self.priceLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    self.categoryLbl.pack(side=tk.LEFT, padx=5, pady=5)
-    self.addToOrderBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    self.nameLbl = ttk.Label(self, textvariable=self.__name, style="Cell.TLabel")
+    self.priceLbl = ttk.Label(self, textvariable=self.__price, style="Cell.TLabel")
+    self.categoryLbl = ttk.Label(self, textvariable=self.__category, style="Cell.TLabel")
+    self.addToOrderBtn = ttk.Button(self, text="ADD", style="Cell.TButton", command=lambda: self.addItemPopUp(parent))
+
+    self.grid_columnconfigure(0, weight=1)
+    self.grid_columnconfigure(1, weight=1)
+    self.grid_columnconfigure(2, weight=1)
+    self.grid_columnconfigure(3, weight=1)
+
+    self.nameLbl.grid(column=0, row=0, sticky="nsew")
+    self.priceLbl.grid(column=1, row=0, sticky="nsew")
+    self.categoryLbl.grid(column=2, row=0, sticky="nsew")
+    self.addToOrderBtn.grid(column=3, row=0, sticky="nsew")
 
     print("---\n\nd: Menu Item row creation was successful.\n\n---")
 
@@ -313,7 +332,7 @@ class MenuItem(tk.Frame):
 
 class Order():
   def __init__(self):
-    pass
+    self.__listOfOrders = {}
 
   def addToOrder(self, itemName):
     pass
