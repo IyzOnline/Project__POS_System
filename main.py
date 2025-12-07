@@ -51,11 +51,11 @@ class App(tk.Tk):
 
     self.sidebarFrame = tk.Frame(self.homeFrame, bg="#3498db")
     self.menuFrame = tk.Frame(self.homeFrame, bg="#49a3df")
-    self.summaryFrame = tk.Frame(self.homeFrame, bg="#5faee3")
+    self.receiptFrame = tk.Frame(self.homeFrame, bg="#5faee3")
 
     self.sidebarFrame.place(relx=0, rely=0, relwidth=0.1, relheight=1.0)
     self.menuFrame.place(relx=0.1, rely=0, relwidth=0.6, relheight=1.0)
-    self.summaryFrame.place(relx=0.72, rely=0, relwidth=0.28, relheight=1.0)
+    self.receiptFrame.place(relx=0.72, rely=0, relwidth=0.28, relheight=1.0)
 
     self.initializeMenuArea()
 
@@ -180,9 +180,6 @@ class App(tk.Tk):
     pass
 
   #Receipt
-  def initializeReceipt_Proto(self) :
-    pass
-
   def initializeReceipt(self) :
     pass
 
@@ -213,7 +210,7 @@ class App(tk.Tk):
                             orderID INTEGER,
                             name TEXT NOT NULL,
                             price INTEGER NOT NULL,
-                            category TEXT NOT NULL 
+                            category TEXT NOT NULL,
                             quantity INTEGER,
                             FOREIGN KEY(orderID) REFERENCES orders(orderID)
                           )
