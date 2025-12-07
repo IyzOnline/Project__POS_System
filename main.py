@@ -396,7 +396,7 @@ class MenuItem(tk.Frame) :
 
 class Order():
   def __init__(self, MenuItemInstances, conn, cursor, commitDBChanges) :
-    self.__listOfOrders = MenuItemInstances
+    self.__ItemsInOrder = MenuItemInstances
     self.__conn = conn
     self.__cursor = cursor
     self.commitDBChanges = commitDBChanges
@@ -409,7 +409,7 @@ class Order():
       self.orderNum = 1
 
   def saveOrderToDB(self) :
-    if not self.__listOfOrders:
+    if not self.__ItemsInOrder:
       print("Order is empty!")
       return 
 
@@ -422,12 +422,12 @@ class Order():
     row = results.fetchone()
     orderID = row[0]
 
-    for key, value in self.__listOfOrders.items():
+    for key, value in self.__ItemsInOrder.items():
       self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?)", (orderID, *value))
 
     self.commitDBChanges("Inserted item rows inside of order_items table in DB.")
 
-    self.__listOfOrders.clear()
+    self.__ItemsInOrder.clear()
 
   def reduceFromOrder(self, itemName):
     pass
