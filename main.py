@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import datetime
 
-class App(tk.Tk):
+class App(tk.Tk) :
   def __init__(self):
     super().__init__()
     self.title("POS System")
@@ -190,21 +190,41 @@ class App(tk.Tk):
     order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
     
     orderNumLbl = ttk.Label(self.receiptFrame, text=f"Order {order.orderNum}", style="Cell.TLabel", anchor="center")
-    orderListFrame = ttk.Frame(self.receiptFrame, style="OrderList.TFrame")
+    self.orderListFrame = ttk.Frame(self.receiptFrame, style="OrderList.TFrame")
     
     orderNumLbl.pack()
-    orderListFrame.pack(expand=True, fill="both")
+    self.orderListFrame.pack(expand=True, fill="both")
 
     self.updateReceiptArea()
 
     checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=order.saveOrderToDB)
+    checkoutBtn.pack()
   
   def updateReceiptArea(self):
+    self.total = 0
+    print(f"Here is the menu item instances: {self.__MenuItemInstances}")
     if not self.__MenuItemInstances:
-      pass
+      print(f"No items in order yet.")
 
-    for key, value in self.__MenuItemInstances:
-      pass
+    for key, value in self.__MenuItemInstances.items():
+      orderItemFrame = ttk.Frame(self.orderListFrame)
+
+      quantityLbl = ttk.Label(orderItemFrame, text=value[3], style="Cell.TLabel", anchor="center")
+      nameLbl = ttk.Label(orderItemFrame, text=value[0], style="Cell.TLabel", anchor="center")
+      sumLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], style="Cell.TLabel", anchor="center")
+
+      self.total += value[1]*value[3]
+
+      orderItemFrame.grid_columnconfigure(0, weight=1)
+      orderItemFrame.grid_columnconfigure(1, weight=1)
+      orderItemFrame.grid_columnconfigure(2, weight=1)
+
+      quantityLbl.grid(column=0, row=0, sticky="nsew")
+      nameLbl.grid(column=1, row=0, sticky="nsew")
+      sumLbl.grid(column=2, row=0, sticky="nsew")
+
+      orderItemFrame.pack(fill="x")
+
 
 #storage implementation
   def initDB(self) :
@@ -412,7 +432,7 @@ class MenuItem(tk.Frame) :
     else:
       print(f"Quantity is already at max -> {currentQuantity}")
 
-class Order():
+class Order() :
   def __init__(self, MenuItemInstances, conn, cursor, commitDBChanges) :
     self.__ItemsInOrder = MenuItemInstances
     self.__conn = conn
