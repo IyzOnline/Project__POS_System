@@ -17,7 +17,6 @@ class App(tk.Tk):
     self.initStyles()
     self.initializeExitFS()
     self.initDB()
-    order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
     self.initializeHomePage()
 
 #UI Implementation
@@ -58,6 +57,7 @@ class App(tk.Tk):
     self.receiptFrame.place(relx=0.72, rely=0, relwidth=0.28, relheight=1.0)
 
     self.initializeMenuArea()
+    self.initializeReceipt()
 
   #Menu
   def initializeMenuArea(self) :
@@ -181,7 +181,12 @@ class App(tk.Tk):
 
   #Receipt
   def initializeReceipt(self) :
-    pass
+    order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
+    
+    currentOrderLbl = ttk.Label(self.receiptFrame, text=f"Order {order.orderNum}", style="Cell.TLabel", anchor="center")
+    currentOrderLbl.pack()
+
+    checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=order.saveOrderToDB)
 
 #storage implementation
   def initDB(self) :
@@ -395,6 +400,13 @@ class Order():
     self.__conn = conn
     self.__cursor = cursor
     self.commitDBChanges = commitDBChanges
+
+    results = self.__cursor.execute("SELECT * FROM orders ORDER BY date DESC")
+    latestResult = results.fetchone()
+    if (latestResult) :
+      self.orderNum = latestResult[0] + 1
+    else:
+      self.orderNum = 1
 
   def saveOrderToDB(self) :
     dateTimeOrder = datetime.datetime.now().isoformat()
