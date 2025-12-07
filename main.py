@@ -22,7 +22,9 @@ class App(tk.Tk) :
     self.total = tk.DoubleVar(value=0)
     self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
 
-    self.initializeHomePage()
+    self.initializeSidebar()
+    self.initializeMainFrame()
+    self.initializeCashierPage()
 
 #UI Implementation
   def initStyles(self) :
@@ -55,24 +57,27 @@ class App(tk.Tk) :
   def exit_fullscreen(self, event=None) :
     self.attributes('-fullscreen', False)
 
-  def initializeHomePage(self) :
-    self.homeFrame = tk.Frame(self, bg="#ffffff")
-    self.homeFrame.pack(expand=True, fill="both", padx=20, pady=20)
+  #Main Frame
+  def initializeMainFrame(self) :
+    self.mainFrame = tk.Frame(self, bg="#ffffff")
+    self.mainFrame.pack(side=tk.LEFT, expand=True, fill="both")
 
-    self.sidebarFrame = tk.Frame(self.homeFrame, bg="#3498db")
-    self.menuFrame = tk.Frame(self.homeFrame, bg="#49a3df")
-    self.receiptFrame = tk.Frame(self.homeFrame, bg="#5faee3")
+  #CashierPage
+  def initializeCashierPage(self):
+    self.menuFrame = tk.Frame(self.mainFrame, bg="#49a3df")
+    self.receiptFrame = tk.Frame(self.mainFrame, bg="#5faee3")
 
-    self.sidebarFrame.place(relx=0, rely=0, relwidth=0.1, relheight=1.0)
-    self.menuFrame.place(relx=0.1, rely=0, relwidth=0.6, relheight=1.0)
-    self.receiptFrame.place(relx=0.72, rely=0, relwidth=0.28, relheight=1.0)
+    self.menuFrame.place(relx=0.0, rely=0, relwidth=0.8, relheight=1.0)
+    self.receiptFrame.place(relx=0.82, rely=0, relwidth=0.18, relheight=1.0)
 
-    self.initializeSidebar()
     self.initializeMenuArea()
     self.initializeReceipt()
 
   #Sidebar
   def initializeSidebar(self) :
+    self.sidebarFrame = tk.Frame(self, bg="#3498db")
+    self.sidebarFrame.pack(side=tk.LEFT, fill="y")
+
     cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Mode")
     kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Mode")
     historyPageBtn = ttk.Button(self.sidebarFrame, text="History Page")
@@ -155,7 +160,7 @@ class App(tk.Tk) :
       item.pack(fill="x")
 
   def createMenuItem(self) :
-    self.homeFrame.pack_forget()
+    self.mainFrame.pack_forget()
 
     def passData():
       if not (nameEntry.get() and priceEntry.get() and categoryEntry.get()):
@@ -181,7 +186,7 @@ class App(tk.Tk) :
 
     createMIFrame.pack()
 
-    returnBtn = ttk.Button(createMIFrame, text="return", command=lambda: self.returnToHome(createMIFrame))
+    returnBtn = ttk.Button(createMIFrame, text="return", command=lambda: self.returnToMainFrame(createMIFrame))
     saveBtn = ttk.Button(createMIFrame, text="Save to DB", command=lambda: self.addMenuItem(passData()))
 
     ttk.Label(createMIFrame, text="- Name -").pack()
@@ -194,10 +199,11 @@ class App(tk.Tk) :
     returnBtn.pack()
     saveBtn.pack()
 
-  def returnToHome(self, currentFrame) :
+  def returnToMainFrame(self, currentFrame) :
     currentFrame.destroy()
     self.clearReceiptInstances()
-    self.initializeHomePage()
+    self.initializeMainFrame()
+    self.initializeCashierPage()
 
   def editMenuItem(self) :
     pass
@@ -297,9 +303,9 @@ class App(tk.Tk) :
       print("You must order something first.")
       return
 
-    self.homeFrame.pack_forget()
-    checkoutFrame = tk.Frame(self, width=500, height=1000)
-    checkoutFrame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+    self.mainFrame.pack_forget()
+    checkoutFrame = tk.Frame(self)
+    checkoutFrame.pack(expand=True, fill="both", anchor="center")
 
     for key, value in self.__MenuItemInstances.items() :
       orderItemFrame = ttk.Frame(checkoutFrame)
@@ -320,14 +326,14 @@ class App(tk.Tk) :
     
     self.initTotal(checkoutFrame)
 
-    returnBtn = ttk.Button(checkoutFrame, text="Return to Order", command=lambda: self.returnToHome(checkoutFrame))
+    returnBtn = ttk.Button(checkoutFrame, text="Return to Order", command=lambda: self.returnToMainFrame(checkoutFrame))
     saveBtn = ttk.Button(checkoutFrame, text="Place Order", command=self.order.saveOrderToDB)
 
     returnBtn.pack()
     saveBtn.pack()
 
   #Kitchen Mode
-  def initKitcheMode(self) :
+  def initKitchenMode(self) :
     pass
 
   #History Page
@@ -448,8 +454,9 @@ class App(tk.Tk) :
     self.__ReceiptListInstances = {}
     self.total = tk.DoubleVar(value=0)
     self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
-    self.homeFrame.destroy()
-    self.initializeHomePage()
+    self.mainFrame.destroy()
+    self.initializeMainFrame()
+    self.initializeCashierPage()
 
 class MenuItem(tk.Frame) :
   def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
