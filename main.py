@@ -36,6 +36,12 @@ class App(tk.Tk):
                     bg="lightgray",
                     bordercolor = "red"
                     )
+    
+    self.style.configure("OrderList.TFrame",
+                    borderwidth=10, 
+                    background="lightgray",
+                    bordercolor="black"
+                    )
 
   def initializeExitFS(self) :
     self.attributes('-fullscreen', True)
@@ -183,10 +189,22 @@ class App(tk.Tk):
   def initializeReceipt(self) :
     order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
     
-    currentOrderLbl = ttk.Label(self.receiptFrame, text=f"Order {order.orderNum}", style="Cell.TLabel", anchor="center")
-    currentOrderLbl.pack()
+    orderNumLbl = ttk.Label(self.receiptFrame, text=f"Order {order.orderNum}", style="Cell.TLabel", anchor="center")
+    orderListFrame = ttk.Frame(self.receiptFrame, style="OrderList.TFrame")
+    
+    orderNumLbl.pack()
+    orderListFrame.pack(expand=True, fill="both")
+
+    self.updateReceiptArea()
 
     checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=order.saveOrderToDB)
+  
+  def updateReceiptArea(self):
+    if not self.__MenuItemInstances:
+      pass
+
+    for key, value in self.__MenuItemInstances:
+      pass
 
 #storage implementation
   def initDB(self) :
