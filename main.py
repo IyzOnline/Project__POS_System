@@ -16,6 +16,7 @@ class App(tk.Tk) :
     self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
     self.total = tk.DoubleVar(value=0)
+    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
 
     self.initStyles()
     self.initializeExitFS()
@@ -197,9 +198,7 @@ class App(tk.Tk) :
 
   #Receipt
   def initializeReceipt(self) :
-    order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
-    
-    orderNumLbl = ttk.Label(self.receiptFrame, text=f"Order {order.orderNum}", style="Cell.TLabel", anchor="center")
+    orderNumLbl = ttk.Label(self.receiptFrame, text=f"Order {self.order.orderNum}", style="Cell.TLabel", anchor="center")
     self.orderListFrame = ttk.Frame(self.receiptFrame, style="OrderList.TFrame")
     
     orderNumLbl.pack()
@@ -208,7 +207,7 @@ class App(tk.Tk) :
     self.updateReceiptArea()
     self.initTotal()
 
-    checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=order.saveOrderToDB)
+    checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=self.order.saveOrderToDB)
     checkoutBtn.pack()
   
   def updateReceiptArea(self) :
@@ -280,9 +279,6 @@ class App(tk.Tk) :
     totalSumLbl.grid(column=1, row=0, sticky="nsew")
 
     totalFrame.pack(fill="x")
-
-  def clearReceiptInstances(self) :
-    self.__ReceiptListInstances = {}
 
 #storage implementation
   def initDB(self) :
@@ -379,6 +375,16 @@ class App(tk.Tk) :
     for row in rows:
       print("----\nItems in MenuItemRecord: ")
       print(f"Name: {row[1]}")
+
+  def clearReceiptInstances(self) :
+    self.__ReceiptListInstances = {}
+
+  def clearAllInstances(self) :
+    self.__MenuItemInstances = {}
+    self.__SavedItemQuantity = {}
+    self.__ReceiptListInstances = {}
+    self.total = tk.DoubleVar(value=0)
+    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges)
 
 class MenuItem(tk.Frame) :
   def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
