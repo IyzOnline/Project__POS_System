@@ -15,6 +15,7 @@ class App(tk.Tk) :
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
+    self.total = tk.DoubleVar(value=0)
 
     self.initStyles()
     self.initializeExitFS()
@@ -205,12 +206,12 @@ class App(tk.Tk) :
     self.orderListFrame.pack(expand=True, fill="both")
 
     self.updateReceiptArea()
+    self.initTotal()
 
     checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=order.saveOrderToDB)
     checkoutBtn.pack()
   
   def updateReceiptArea(self) :
-    self.total = 0
     deletionKey = None
     print(f"Here are the menu item instances: {self.__MenuItemInstances}")
     if not self.__MenuItemInstances:
@@ -222,6 +223,9 @@ class App(tk.Tk) :
         if value[3] == 0:
           print("destruction of instance")
           self.__ReceiptListInstances[key][4].destroy()
+
+          self.total.set(self.total.get() - (self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]))
+          
           del self.__ReceiptListInstances[key]
           deletionKey = key
         elif self.__ReceiptListInstances[key][3] == value[3] :
@@ -229,12 +233,12 @@ class App(tk.Tk) :
           print(self.__ReceiptListInstances[key])
         else :
           print("not equal")
-          self.total -= self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]
+
+          self.total.set(self.total.get() - (self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]))
 
           self.__ReceiptListInstances[key] = value + (self.__ReceiptListInstances[key][4],)
-          print("Quantity: " + str(self.__ReceiptListInstances[key][3]))
-    
-          self.total += self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]
+
+          self.total.set(self.total.get() + (self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]))
 
           savedQuantityLbl = self.__ReceiptListInstances[key][4].nametowidget("quantityLbl")
           savedSumLbl = self.__ReceiptListInstances[key][4].nametowidget("sumLbl")
@@ -249,7 +253,7 @@ class App(tk.Tk) :
         nameLbl = ttk.Label(orderItemFrame, text=value[0], style="Cell.TLabel", anchor="center", name="nameLbl")
         sumLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], style="Cell.TLabel", anchor="center", name="sumLbl")
 
-        self.total += value[1]*value[3]
+        self.total.set(self.total.get() + (self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]))
 
         orderItemFrame.grid_columnconfigure(0, weight=1)
         orderItemFrame.grid_columnconfigure(1, weight=1)
@@ -263,6 +267,19 @@ class App(tk.Tk) :
 
     if (deletionKey) :
       del self.__MenuItemInstances[deletionKey]
+
+  def initTotal(self):
+    totalFrame = ttk.Frame(self.receiptFrame)
+    totalTxtLbl = ttk.Label(totalFrame, text="Total:", anchor="center")
+    totalSumLbl = ttk.Label(totalFrame, textvariable=self.total, anchor="center")
+    
+    totalFrame.grid_columnconfigure(0, weight=1)
+    totalFrame.grid_columnconfigure(1, weight=1)
+    
+    totalTxtLbl.grid(column=0, row=0, sticky="nsew")
+    totalSumLbl.grid(column=1, row=0, sticky="nsew")
+
+    totalFrame.pack(fill="x")
 
   def clearReceiptInstances(self) :
     self.__ReceiptListInstances = {}
