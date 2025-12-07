@@ -24,7 +24,7 @@ class App(tk.Tk) :
 
     self.initializeSidebar()
     self.initializeMainFrame()
-    self.initializeCashierPage()
+    self.initCashierMode()
 
 #UI Implementation
   def initStyles(self) :
@@ -62,8 +62,8 @@ class App(tk.Tk) :
     self.mainFrame = tk.Frame(self, bg="#ffffff")
     self.mainFrame.pack(side=tk.LEFT, expand=True, fill="both")
 
-  #CashierPage
-  def initializeCashierPage(self):
+  #Cashier Mode
+  def initCashierMode(self):
     self.menuFrame = tk.Frame(self.mainFrame, bg="#49a3df")
     self.receiptFrame = tk.Frame(self.mainFrame, bg="#5faee3")
 
@@ -72,15 +72,26 @@ class App(tk.Tk) :
 
     self.initializeMenuArea()
     self.initializeReceipt()
+  
+  #Kitchen Mode
+  def initKitchenMode(self) :
+    kitchenOrdersFrame = tk.Frame(self.mainFrame, padx=10, pady=10, background="#ffffff")
+    kitchenOrdersFrame.pack()
+    tempLbl = tk.Label(kitchenOrdersFrame, text="KITCHEN MODE")
+    tempLbl.pack()
+
+  #History Page
+  def initHistoryPage(self) :
+    pass
 
   #Sidebar
   def initializeSidebar(self) :
     self.sidebarFrame = tk.Frame(self, bg="#3498db")
     self.sidebarFrame.pack(side=tk.LEFT, fill="y")
 
-    cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Mode")
-    kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Mode")
-    historyPageBtn = ttk.Button(self.sidebarFrame, text="History Page")
+    cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Mode", command=lambda: self.transitionFrame(self.initCashierMode))
+    kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Mode", command=lambda: self.transitionFrame(self.initKitchenMode))
+    historyPageBtn = ttk.Button(self.sidebarFrame, text="History Page", command=lambda: self.transitionFrame(self.initHistoryPage))
 
     cashierPageBtn.pack(padx=5, pady=5)
     kitchenPageBtn.pack(padx=5, pady=5)
@@ -96,7 +107,7 @@ class App(tk.Tk) :
     self.menuTable.place(relx=0, rely=0.1, relwidth=1.0, relheight=0.8)
     self.menuLowerBtns.place(relx=0, rely=0.9, relwidth=1.0, relheight=0.1)
 
-    createBtn = ttk.Button(self.menuLowerBtns, text="+", command=self.createMenuItem)
+    createBtn = ttk.Button(self.menuLowerBtns, text="+", command=lambda: self.transitionFrame(self.initCreateMIPage))
     deleteBtn = ttk.Button(self.menuLowerBtns, text="-")
     editBtn = ttk.Button(self.menuLowerBtns, text="/")
 
@@ -159,9 +170,7 @@ class App(tk.Tk) :
       self.__SavedItemQuantity[recordName] = item.quantity
       item.pack(fill="x")
 
-  def createMenuItem(self) :
-    self.mainFrame.pack_forget()
-
+  def initCreateMIPage(self) :
     def passData():
       if not (nameEntry.get() and priceEntry.get() and categoryEntry.get()):
         return None
@@ -178,15 +187,14 @@ class App(tk.Tk) :
       print(data)
       return data
 
-    createMIFrame = tk.Frame(self)
+    createMIFrame = tk.Frame(self.mainFrame, background="red")
+    createMIFrame.pack()
 
     nameEntry = ttk.Entry(createMIFrame, width=30, font=("Helvetica", 14))
     priceEntry = ttk.Entry(createMIFrame, width=30, font=("Helvetica", 14))
     categoryEntry = ttk.Entry(createMIFrame, width=30, font=("Helvetica", 14))
 
-    createMIFrame.pack()
-
-    returnBtn = ttk.Button(createMIFrame, text="return", command=lambda: self.returnToMainFrame(createMIFrame))
+    returnBtn = ttk.Button(createMIFrame, text="return", command=lambda: self.transitionFrame(self.initCashierMode))
     saveBtn = ttk.Button(createMIFrame, text="Save to DB", command=lambda: self.addMenuItem(passData()))
 
     ttk.Label(createMIFrame, text="- Name -").pack()
@@ -199,11 +207,11 @@ class App(tk.Tk) :
     returnBtn.pack()
     saveBtn.pack()
 
-  def returnToMainFrame(self, currentFrame) :
-    currentFrame.destroy()
+  def transitionFrame(self, initNewPage) :
+    self.mainFrame.destroy()
     self.clearReceiptInstances()
     self.initializeMainFrame()
-    self.initializeCashierPage()
+    initNewPage()
 
   def editMenuItem(self) :
     pass
@@ -222,7 +230,7 @@ class App(tk.Tk) :
     self.updateReceiptArea()
     self.initTotal(self.receiptFrame)
 
-    checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=self.goToCheckout)
+    checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=self.initCheckoutPage)
     checkoutBtn.pack()
   
   def updateReceiptArea(self) :
@@ -298,13 +306,12 @@ class App(tk.Tk) :
     totalFrame.pack(fill="x")
 
   #Checkout Page
-  def goToCheckout(self) :
+  def initCheckoutPage(self) :
     if not self.__MenuItemInstances:
       print("You must order something first.")
       return
 
-    self.mainFrame.pack_forget()
-    checkoutFrame = tk.Frame(self)
+    checkoutFrame = tk.Frame(self.mainFrame)
     checkoutFrame.pack(expand=True, fill="both", anchor="center")
 
     for key, value in self.__MenuItemInstances.items() :
@@ -326,19 +333,11 @@ class App(tk.Tk) :
     
     self.initTotal(checkoutFrame)
 
-    returnBtn = ttk.Button(checkoutFrame, text="Return to Order", command=lambda: self.returnToMainFrame(checkoutFrame))
+    returnBtn = ttk.Button(checkoutFrame, text="Return to Order", command=lambda: self.transitionFrame(self.initCashierMode))
     saveBtn = ttk.Button(checkoutFrame, text="Place Order", command=self.order.saveOrderToDB)
 
     returnBtn.pack()
     saveBtn.pack()
-
-  #Kitchen Mode
-  def initKitchenMode(self) :
-    pass
-
-  #History Page
-  def initHistoryPage(self) :
-    pass
 
 #storage implementation
   def initDB(self) :
@@ -456,7 +455,7 @@ class App(tk.Tk) :
     self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
     self.mainFrame.destroy()
     self.initializeMainFrame()
-    self.initializeCashierPage()
+    self.initCashierMode()
 
 class MenuItem(tk.Frame) :
   def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
