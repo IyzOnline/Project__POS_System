@@ -85,10 +85,27 @@ class App(tk.Tk) :
   def initHistoryPage(self) :
     historyPageFrame = tk.Frame(self.mainFrame, padx=10, pady=10, background="#ffffff")
     historyPageFrame.pack()
-    self.
+    self.displayHistoryTableColumns(historyPageFrame)
+    self.displayHistoryTable(historyPageFrame)
 
-  def displayHistoryTable(self):
+  def displayHistoryTable(self, parent):
+    historyTableLbl = ttk.Label(parent, text="Order History")
+    historyTableLbl.pack()
 
+    self.reqForOrderHistory(parent)
+    #for key, value in self.__OrderRecords.items():
+  
+  def displayHistoryTableColumns(self, parent):
+    #for key, values in self.__MenuItemRecords.items():
+    pass
+
+  """
+    self.__OrderRecords[order[0]] = {
+        "orderID": order[0], 
+        "date": datetime.fromisoformat(order[1]),
+        "items": {}
+      }
+  """
 
   #Sidebar
   def initializeSidebar(self) :
