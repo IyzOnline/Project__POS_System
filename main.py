@@ -211,6 +211,7 @@ class App(tk.Tk) :
   
   def updateReceiptArea(self) :
     self.total = 0
+    deletionKey = None
     print(f"Here are the menu item instances: {self.__MenuItemInstances}")
     if not self.__MenuItemInstances:
       print(f"No items in order yet.")
@@ -218,10 +219,14 @@ class App(tk.Tk) :
     for key, value in self.__MenuItemInstances.items() :
       if key in self.__ReceiptListInstances :
         print("Horray!")
-        if self.__ReceiptListInstances[key][3] == value[3] :
+        if value[3] == 0:
+          print("destruction of instance")
+          self.__ReceiptListInstances[key][4].destroy()
+          del self.__ReceiptListInstances[key]
+          deletionKey = key
+        elif self.__ReceiptListInstances[key][3] == value[3] :
           print("equal")
-          print(self.__ReceiptListInstances)
-          continue
+          print(self.__ReceiptListInstances[key])
         else :
           print("not equal")
           self.total -= self.__ReceiptListInstances[key][1] * self.__ReceiptListInstances[key][3]
@@ -255,6 +260,9 @@ class App(tk.Tk) :
         sumLbl.grid(column=2, row=0, sticky="nsew")
 
         orderItemFrame.pack(fill="x")
+
+    if (deletionKey) :
+      del self.__MenuItemInstances[deletionKey]
 
   def clearReceiptInstances(self) :
     self.__ReceiptListInstances = {}
@@ -443,17 +451,16 @@ class MenuItem(tk.Frame) :
     print("d: Buttons for PopUp Frame packed.")
 
   def addToOrder(self, event=None) :
-    if self.__quantity.get() == 0 :
-      print("Quantity cannot be zero")
+    name = self.__name.get()
+    price = self.__price.get()
+    category = self.__category.get()
+    quantity = self.__quantity.get()
+
+    if self.quantity.get() == 0 and name not in self.__MenuItemInstances:
+        print("Quantity cannot be zero")
     else:
-      name = self.__name.get()
-      price = self.__price.get()
-      category = self.__category.get()
-      quantity = self.__quantity.get()
-      
       self.__MenuItemInstances[name] = (name, price, category, quantity)
       self.updateReceiptArea()
-      
       self.popUp.destroy()
     
   def decreaseQuantity(self, event=None) :
