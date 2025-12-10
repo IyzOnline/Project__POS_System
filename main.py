@@ -138,7 +138,14 @@ class App(tk.Tk) :
         categoryCol = ttk.Label(orderItemRow, text=orderItemData["category"], style="Cell.TLabel", anchor="center")
         priceCol = ttk.Label(orderItemRow, text=f"₱{orderItemData['price']:.2f}", style="Cell.TLabel", anchor="center")
         quantityCol = ttk.Label(orderItemRow, text=orderItemData["quantity"], style="Cell.TLabel", anchor="center")
-        totalCol = ttk.Label(orderItemRow, text=f"₱{orderItemData['quantity'] * orderItemData['price']:.2f}", style="Cell.TLabel", anchor="center")
+
+        total = orderItemData['quantity'] * orderItemData['price']
+        print(total)
+
+        totalCol = ttk.Label(orderItemRow, text=f"₱{total:.2f}", style="Cell.TLabel", anchor="center")
+
+        for i in range(7):
+           orderItemRow.grid_columnconfigure(i, weight=1)
 
         orderIDCol.grid(column=0, row=0, sticky="nsew")
         dateCol.grid(column=1, row=0, sticky="nsew")
@@ -519,7 +526,7 @@ class App(tk.Tk) :
     self.__OrderRecords = {}
     orders = self.__cursor.execute("SELECT * FROM orders ORDER BY date ASC")
     results = orders.fetchall()
-    
+
     for order in results :
       self.__OrderRecords[order[0]] = {
         "orderID": order[0], 
