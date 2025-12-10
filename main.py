@@ -473,7 +473,8 @@ class App(tk.Tk) :
 
   #History Page DB Functionality
   def reqForOrderHistory(self) :
-    orders = self.__cursor.execute("SELECT * FROM orders")
+    self.__OrderRecords = {}
+    orders = self.__cursor.execute("SELECT * FROM orders ORDER BY orderID ASC")
     
     for order in orders :
       self.__OrderRecords[order[0]] = {
