@@ -96,8 +96,34 @@ class App(tk.Tk) :
     #for key, value in self.__OrderRecords.items():
   
   def displayHistoryTableColumns(self, parent):
-    #for key, values in self.__MenuItemRecords.items():
-    pass
+    columns = tk.Frame(parent)
+
+    orderIDCol = ttk.Label(columns, text="Order ID", style="Cell.TLabel", anchor="center")
+    dateCol = ttk.Label(columns, text="Date", style="Cell.TLabel", anchor="center")
+    nameCol = ttk.Label(columns, text="Name", style="Cell.TLabel", anchor="center")
+    categoryCol = ttk.Label(columns, text="Category", style="Cell.TLabel", anchor="center")
+    priceCol = ttk.Label(columns, text="Price", style="Cell.TLabel", anchor="center")
+    quantityCol = ttk.Label(columns, text="Quantity", style="Cell.TLabel", anchor="center")
+    totalCol = ttk.Label(columns, text="Total", style="Cell.TLabel", anchor="center")
+
+    columns.grid_columnconfigure(0, weight=1)
+    columns.grid_columnconfigure(1, weight=1)
+    columns.grid_columnconfigure(2, weight=1)
+    columns.grid_columnconfigure(3, weight=1)
+    columns.grid_columnconfigure(4, weight=1)
+    columns.grid_columnconfigure(5, weight=1)
+    columns.grid_columnconfigure(6, weight=1)
+
+
+    orderIDCol.grid(column=0, row=0, sticky="nsew")
+    dateCol.grid(column=1, row=0, sticky="nsew")
+    nameCol.grid(column=2, row=0, sticky="nsew")
+    categoryCol.grid(column=3, row=0, sticky="nsew")
+    priceCol.grid(column=4, row=0, sticky="nsew")
+    quantityCol.grid(column=5, row=0, sticky="nsew")
+    totalCol.grid(column=6, row=0, sticky="nsew")
+    
+    columns.pack(fill="x")
 
   """
     self.__OrderRecords[order[0]] = {
