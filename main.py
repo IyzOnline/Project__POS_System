@@ -96,7 +96,7 @@ class App(tk.Tk) :
     columns = tk.Frame(parent)
 
     orderIDCol = ttk.Label(columns, text="Order ID", style="Cell.TLabel", anchor="center")
-    dateCol = ttk.Label(columns, text="Date", style="Cell.TLabel", anchor="center")
+    dateCol = ttk.Label(columns, text="Date and Time", style="Cell.TLabel", anchor="center")
     nameCol = ttk.Label(columns, text="Name", style="Cell.TLabel", anchor="center")
     categoryCol = ttk.Label(columns, text="Category", style="Cell.TLabel", anchor="center")
     priceCol = ttk.Label(columns, text="Price", style="Cell.TLabel", anchor="center")
@@ -133,7 +133,7 @@ class App(tk.Tk) :
         orderItemRow = tk.Frame(parent)
 
         orderIDCol = ttk.Label(orderItemRow, text=orderData["orderID"], style="Cell.TLabel", anchor="center")
-        dateCol = ttk.Label(orderItemRow, text=orderData["date"], style="Cell.TLabel", anchor="center")
+        dateCol = ttk.Label(orderItemRow, text=orderData["date"].strftime("%Y-%m-%d - %H:%M:%S %p"), style="Cell.TLabel", anchor="center")
         nameCol = ttk.Label(orderItemRow, text=orderItemData["name"], style="Cell.TLabel", anchor="center")
         categoryCol = ttk.Label(orderItemRow, text=orderItemData["category"], style="Cell.TLabel", anchor="center")
         priceCol = ttk.Label(orderItemRow, text=f"₱{orderItemData['price']:.2f}", style="Cell.TLabel", anchor="center")
