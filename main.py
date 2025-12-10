@@ -68,7 +68,7 @@ class App(tk.Tk) :
     self.menuFrame = tk.Frame(self.mainFrame, bg="#49a3df")
     self.receiptFrame = tk.Frame(self.mainFrame, bg="#5faee3")
 
-    self.menuFrame.place(relx=0.0, rely=0, relwidth=0.8, relheight=1.0)
+    self.menuFrame.place(relx=0.0, rely=0, relwidth=0.82, relheight=1.0)
     self.receiptFrame.place(relx=0.82, rely=0, relwidth=0.18, relheight=1.0)
 
     self.initializeMenuArea()
@@ -172,9 +172,9 @@ class App(tk.Tk) :
 
   #Menu
   def initializeMenuArea(self) :
-    self.menuSearch = tk.Frame(self.menuFrame, bg="#333333")
-    self.menuTable = tk.Frame(self.menuFrame, bg="#4d4d4d")
-    self.menuLowerBtns = tk.Frame(self.menuFrame, bg="#333333")
+    self.menuSearch = tk.Frame(self.menuFrame, bg="#333333", padx=10, pady=10)
+    self.menuTable = tk.Frame(self.menuFrame, bg="#4d4d4d", padx=20, pady=20)
+    self.menuLowerBtns = tk.Frame(self.menuFrame, bg="#333333", padx=10, pady=10)
 
     self.menuSearch.place(relx=0, rely=0, relwidth=1.0, relheight=0.1)
     self.menuTable.place(relx=0, rely=0.1, relwidth=1.0, relheight=0.8)
