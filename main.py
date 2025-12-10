@@ -234,9 +234,9 @@ class App(tk.Tk) :
       #print(f"Here are all the saved item quantities: {self.__SavedItemQuantity}")
       if recordName in self.__SavedItemQuantity :
         updatedQuantity = self.__SavedItemQuantity[recordName].get()
-        item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
+        item = MenuItem(self.menuTable, self, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
       else :
-        item = MenuItem(self.menuTable, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, 0)
+        item = MenuItem(self.menuTable, self, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, 0)
       
       self.__SavedItemQuantity[recordName] = item.quantity
       item.pack(fill="x")
@@ -413,6 +413,30 @@ class App(tk.Tk) :
     returnBtn.pack()
     saveBtn.pack()
 
+  def cantCheckoutPopUp(self):
+    popUp = self.createPopUp(self)
+
+  #Centralized Pop-Up Creation:
+  def createPopUp(self, parent):
+    popUp = tk.Toplevel(parent, bd=2)
+    parent_x = self.root.winfo_x()
+    parent_y = self.root.winfo_y()
+    parent_width = self.root.winfo_width()
+    parent_height = self.root.winfo_height()
+
+    w = 300
+    h = 200
+
+    x = parent_x + (parent_width // 2) - (w // 2)
+    y = parent_y + (parent_height // 2) - (h // 2)
+
+    popUp.geometry(f"{w}x{h}+{x}+{y}")
+
+    popUp.transient(parent)
+    popUp.grab_set()
+    
+    return popUp
+    
 #storage implementation
   def initDB(self) :
     self.__conn = sqlite3.connect(Path("db")/"menuitems.db")
@@ -557,9 +581,10 @@ class App(tk.Tk) :
 
 
 class MenuItem(tk.Frame) :
-  def __init__(self, parent, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
+  def __init__(self, parent, root, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
     self.__MenuItemInstances = MenuItemInstances
     self.updateReceiptArea = updateReceiptArea
+    self.root = root
     super().__init__(parent)
     self.initStyles()
 
@@ -573,7 +598,7 @@ class MenuItem(tk.Frame) :
     self.nameLbl = ttk.Label(self, textvariable=self.__name, style="Cell.TLabel")
     self.priceLbl = ttk.Label(self, textvariable=self.__price, style="Cell.TLabel")
     self.categoryLbl = ttk.Label(self, textvariable=self.__category, style="Cell.TLabel")
-    self.addToOrderBtn = ttk.Button(self, text="ADD", style="Cell.TButton", command=lambda: self.addItemPopUp(parent))
+    self.addToOrderBtn = ttk.Button(self, text="ADD", style="Cell.TButton", command=lambda: self.addItemPopUp(root))
 
     self.grid_columnconfigure(0, weight=1)
     self.grid_columnconfigure(1, weight=1)
@@ -608,7 +633,22 @@ class MenuItem(tk.Frame) :
                     )
 
   def addItemPopUp(self, parent) :
-    self.popUp = tk.Frame(parent, bd=2, relief="raised")
+    self.popUp = tk.Toplevel(parent, bd=2)
+    parent_x = self.root.winfo_x()
+    parent_y = self.root.winfo_y()
+    parent_width = self.root.winfo_width()
+    parent_height = self.root.winfo_height()
+
+    w = 300
+    h = 200
+
+    x = parent_x + (parent_width // 2) - (w // 2)
+    y = parent_y + (parent_height // 2) - (h // 2)
+
+    self.popUp.geometry(f"{w}x{h}+{x}+{y}")
+
+    self.popUp.transient(parent)
+    self.popUp.grab_set()
 
     popNameLbl = ttk.Label(self.popUp, textvariable=self.__name)
     popPriceLbl = ttk.Label(self.popUp, textvariable=self.__price)
@@ -619,8 +659,6 @@ class MenuItem(tk.Frame) :
     popCategoryLbl.pack(padx=5, pady=5)
     self.createBtns()
 
-    self.popUp.place(relx=0.5, rely=0.5, anchor="center", width=300, height=200)
-    self.popUp.lift()
     self.increaseBtn.focus_set()
 
   def createBtns(self) :
@@ -650,7 +688,8 @@ class MenuItem(tk.Frame) :
     quantity = self.__quantity.get()
 
     if self.quantity.get() == 0 and name not in self.__MenuItemInstances:
-        print("Quantity cannot be zero")
+      print("No quantity added. Returning to Menu.")
+      self.popUp.destroy()
     else:
       self.__MenuItemInstances[name] = (name, price, category, quantity)
       self.updateReceiptArea()
