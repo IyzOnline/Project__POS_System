@@ -122,9 +122,9 @@ class App(tk.Tk) :
 
   #Menu
   def initializeMenuArea(self) :
-    self.menuSearch = tk.Frame(self.menuFrame, bg="#8049df")
-    self.menuTable = tk.Frame(self.menuFrame, bg="#df4949")
-    self.menuLowerBtns = tk.Frame(self.menuFrame, bg="#448743")
+    self.menuSearch = tk.Frame(self.menuFrame, bg="#333333")
+    self.menuTable = tk.Frame(self.menuFrame, bg="#4d4d4d")
+    self.menuLowerBtns = tk.Frame(self.menuFrame, bg="#333333")
 
     self.menuSearch.place(relx=0, rely=0, relwidth=1.0, relheight=0.1)
     self.menuTable.place(relx=0, rely=0.1, relwidth=1.0, relheight=0.8)
