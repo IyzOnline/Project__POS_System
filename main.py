@@ -169,7 +169,7 @@ class App(tk.Tk) :
     categoryCol.grid(column=2, row=0, sticky="nsew")
     addCol.grid(column=3, row=0, sticky="nsew")
     
-    columns.pack()
+    columns.pack(fill="x")
 
   def initializeMenuItems(self) :
     self.empty = None
