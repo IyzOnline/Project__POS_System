@@ -180,13 +180,11 @@ class App(tk.Tk) :
     self.menuTable.place(relx=0, rely=0.1, relwidth=1.0, relheight=0.8)
     self.menuLowerBtns.place(relx=0, rely=0.9, relwidth=1.0, relheight=0.1)
 
-    createBtn = ttk.Button(self.menuLowerBtns, text="+", command=lambda: self.transitionFrame(self.initCreateMIPage))
-    deleteBtn = ttk.Button(self.menuLowerBtns, text="-")
-    editBtn = ttk.Button(self.menuLowerBtns, text="/")
+    createBtn = ttk.Button(self.menuLowerBtns, text="Add Menu Item", command=lambda: self.transitionFrame(self.initCreateMIPage))
+    deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item")
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
-    editBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
     self.initMenuTableColumns()
     self.initializeMenuItems()
