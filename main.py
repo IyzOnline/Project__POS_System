@@ -93,7 +93,9 @@ class App(tk.Tk) :
     historyTableLbl.pack()
 
     self.reqForOrderHistory(parent)
-    #for key, value in self.__OrderRecords.items():
+    for key, value in self.__OrderRecords.items():
+      for itemKeys, itemValues in value["items"].items():
+
   
   def displayHistoryTableColumns(self, parent):
     columns = tk.Frame(parent)
@@ -500,7 +502,7 @@ class App(tk.Tk) :
   #History Page DB Functionality
   def reqForOrderHistory(self) :
     self.__OrderRecords = {}
-    orders = self.__cursor.execute("SELECT * FROM orders ORDER BY orderID ASC")
+    orders = self.__cursor.execute("SELECT * FROM orders ORDER BY date ASC")
     
     for order in orders :
       self.__OrderRecords[order[0]] = {
