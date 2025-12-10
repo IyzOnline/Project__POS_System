@@ -382,7 +382,7 @@ class App(tk.Tk) :
   #Checkout Page
   def initCheckoutPage(self) :
     if not self.__MenuItemInstances:
-      print("You must order something first.")
+      self.cantCheckoutPopUp()
       return
 
     checkoutFrame = tk.Frame(self.mainFrame)
@@ -415,14 +415,19 @@ class App(tk.Tk) :
 
   def cantCheckoutPopUp(self):
     popUp = self.createPopUp(self)
+    contentFrame = tk.Frame(popUp, padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+    ttk.Label(contentFrame, text="You must order something first.").pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
 
   #Centralized Pop-Up Creation:
   def createPopUp(self, parent):
     popUp = tk.Toplevel(parent, bd=2)
-    parent_x = self.root.winfo_x()
-    parent_y = self.root.winfo_y()
-    parent_width = self.root.winfo_width()
-    parent_height = self.root.winfo_height()
+    popUp.title("Notification")
+    parent_x = self.winfo_x()
+    parent_y = self.winfo_y()
+    parent_width = self.winfo_width()
+    parent_height = self.winfo_height()
 
     w = 300
     h = 200
