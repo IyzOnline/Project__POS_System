@@ -258,25 +258,28 @@ class App(tk.Tk) :
       print(data)
       return data
 
-    createMIFrame = tk.Frame(self.mainFrame, background="red")
-    createMIFrame.pack()
+    createMIFrame = tk.Frame(self.mainFrame, background="#333333")
+    createMIFrame.pack(expand=True, fill="both", anchor=tk.CENTER)
 
-    nameEntry = ttk.Entry(createMIFrame, width=30, font=("Helvetica", 14))
-    priceEntry = ttk.Entry(createMIFrame, width=30, font=("Helvetica", 14))
-    categoryEntry = ttk.Entry(createMIFrame, width=30, font=("Helvetica", 14))
+    contentFrame = tk.Frame(createMIFrame, background="#4d4d4d", padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
 
-    returnBtn = ttk.Button(createMIFrame, text="return", command=lambda: self.transitionFrame(self.initCashierMode))
-    saveBtn = ttk.Button(createMIFrame, text="Save to DB", command=lambda: self.addMenuItem(passData()))
+    nameEntry = ttk.Entry(contentFrame, width=30, font=("Helvetica", 14))
+    priceEntry = ttk.Entry(contentFrame, width=30, font=("Helvetica", 14))
+    categoryEntry = ttk.Entry(contentFrame, width=30, font=("Helvetica", 14))
 
-    ttk.Label(createMIFrame, text="- Name -").pack()
-    nameEntry.pack()
-    ttk.Label(createMIFrame, text="- Price -").pack()
-    priceEntry.pack()
-    ttk.Label(createMIFrame, text="- Category -").pack()
-    categoryEntry.pack()
+    saveBtn = ttk.Button(contentFrame, text="Save to DB", command=lambda: self.addMenuItem(passData()))
+    returnBtn = ttk.Button(contentFrame, text="Return to Menu", command=lambda: self.transitionFrame(self.initCashierMode))
 
-    returnBtn.pack()
-    saveBtn.pack()
+    ttk.Label(contentFrame, text="- Name -").pack(anchor="center", pady=5)
+    nameEntry.pack(anchor="center", pady=5)
+    ttk.Label(contentFrame, text="- Price -").pack(anchor="center", pady=5)
+    priceEntry.pack(anchor="center", pady=5)
+    ttk.Label(contentFrame, text="- Category -").pack(anchor="center", pady=5)
+    categoryEntry.pack(anchor="center", pady=5)
+
+    saveBtn.pack(anchor="center", pady=5)
+    returnBtn.pack(anchor="center", pady=5)
 
   def transitionFrame(self, initNewPage) :
     self.mainFrame.destroy()
