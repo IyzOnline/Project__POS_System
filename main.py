@@ -93,9 +93,31 @@ class App(tk.Tk) :
     historyTableLbl.pack()
 
     self.reqForOrderHistory(parent)
-    for key, value in self.__OrderRecords.items():
-      for itemKeys, itemValues in value["items"].items():
+    if not self.__OrderRecords:
+      print("No orders recorded")
+      return
 
+    for key, orderData in self.__OrderRecords.items():
+      for orderItemKey, orderItemData in orderData["items"].items():
+        orderItemRow = tk.Frame(parent)
+
+        orderIDCol = ttk.Label(orderItemRow, text=orderData["orderID"], style="Cell.TLabel", anchor="center")
+        dateCol = ttk.Label(orderItemRow, text=orderData["date"], style="Cell.TLabel", anchor="center")
+        nameCol = ttk.Label(orderItemRow, text=orderItemData["name"], style="Cell.TLabel", anchor="center")
+        categoryCol = ttk.Label(orderItemRow, text=orderItemData["category"], style="Cell.TLabel", anchor="center")
+        priceCol = ttk.Label(orderItemRow, text=f"₱{orderItemData['price']:.2f}", style="Cell.TLabel", anchor="center")
+        quantityCol = ttk.Label(orderItemRow, text=orderItemData["quantity"], style="Cell.TLabel", anchor="center")
+        totalCol = ttk.Label(orderItemRow, text=f"₱{orderItemData['quantity'] * orderItemData['price']:.2f}", style="Cell.TLabel", anchor="center")
+
+        orderIDCol.grid(column=0, row=0, sticky="nsew")
+        dateCol.grid(column=1, row=0, sticky="nsew")
+        nameCol.grid(column=2, row=0, sticky="nsew")
+        categoryCol.grid(column=3, row=0, sticky="nsew")
+        priceCol.grid(column=4, row=0, sticky="nsew")
+        quantityCol.grid(column=5, row=0, sticky="nsew")
+        totalCol.grid(column=6, row=0, sticky="nsew")
+        
+        orderItemRow.pack(fill="x")
   
   def displayHistoryTableColumns(self, parent):
     columns = tk.Frame(parent)
