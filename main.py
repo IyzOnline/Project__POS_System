@@ -518,11 +518,12 @@ class App(tk.Tk) :
   def reqForOrderHistory(self) :
     self.__OrderRecords = {}
     orders = self.__cursor.execute("SELECT * FROM orders ORDER BY date ASC")
+    results = orders.fetchall()
     
-    for order in orders :
+    for order in results :
       self.__OrderRecords[order[0]] = {
         "orderID": order[0], 
-        "date": datetime.fromisoformat(order[1]),
+        "date": datetime.datetime.fromisoformat(order[1]),
         "items": {}
       }
 
@@ -694,6 +695,8 @@ class Order() :
     self.commitDBChanges("Saved items in receipt to order_items table in DB.")
 
     self.clearAllInstances()
+
+    print("Order saved! New order ready.")
 
   def reduceFromOrder(self, itemName):
     pass
