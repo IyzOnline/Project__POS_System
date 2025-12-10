@@ -524,7 +524,7 @@ class App(tk.Tk) :
   #History Page DB Functionality
   def reqForOrderHistory(self) :
     self.__OrderRecords = {}
-    orders = self.__cursor.execute("SELECT * FROM orders ORDER BY date ASC")
+    orders = self.__cursor.execute("SELECT * FROM orders ORDER BY date DESC")
     results = orders.fetchall()
 
     for order in results :
