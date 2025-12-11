@@ -601,23 +601,35 @@ class App(tk.Tk) :
     totalTxtLbl.grid(column=0, row=0, sticky="nsew")
     totalSumLbl.grid(column=1, row=0, sticky="nsew")
 
-    totalFrame.pack(fill="x")
+    totalFrame.pack(fill="x", pady=10)
 
   #Checkout Page
   def initCheckoutPage(self) :
     if not self.__MenuItemInstances:
       self.cantCheckoutPopUp()
       return
+    
+    self.mainFrame.destroy()
+    self.clearReceiptInstances()
+    self.initializeMainFrame()
 
-    checkoutFrame = tk.Frame(self.mainFrame)
-    checkoutFrame.pack(expand=True, fill="both", anchor="center")
+    checkoutFrame = tk.Frame(self.mainFrame,  background="#333333")
+    checkoutFrame.pack(expand=True, fill="both", anchor="center", padx=10, pady=10)
+
+    contentFrame = tk.Frame(checkoutFrame, padx=10, pady=10, width=500, height=700)
+    contentFrame.pack(expand=True, anchor="center")
+
+    orderLbl = tk.Label(contentFrame, text=f"Order {self.order.orderNum}")
+    orderLbl.pack(fill="x", anchor="center", pady=20)
+
+    tk.Label(contentFrame, text="=======================================================").pack(fill="x", anchor="center")
 
     for key, value in self.__MenuItemInstances.items() :
-      orderItemFrame = ttk.Frame(checkoutFrame)
+      orderItemFrame = ttk.Frame(contentFrame)
 
-      quantityLbl = ttk.Label(orderItemFrame, text=value[3], anchor="center", name="quantityLbl")
-      nameLbl = ttk.Label(orderItemFrame, text=value[0], anchor="center", name="nameLbl")
-      productLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], anchor="center", name="sumLbl")
+      quantityLbl = ttk.Label(orderItemFrame, text=value[3], anchor="center", name="quantityLbl", width=30)
+      nameLbl = ttk.Label(orderItemFrame, text=value[0], anchor="center", name="nameLbl", width=30)
+      productLbl = ttk.Label(orderItemFrame, text=f"₱{value[1]*value[3]}", anchor="center", name="sumLbl", width=30)
 
       orderItemFrame.grid_columnconfigure(0, weight=1)
       orderItemFrame.grid_columnconfigure(1, weight=1)
@@ -627,15 +639,16 @@ class App(tk.Tk) :
       nameLbl.grid(column=1, row=0, sticky="nsew")
       productLbl.grid(column=2, row=0, sticky="nsew")
 
-      orderItemFrame.pack(fill="x")
+      orderItemFrame.pack(fill="x", pady=5)
     
-    self.initTotal(checkoutFrame)
+    tk.Label(contentFrame, text="=======================================================").pack(fill="x", anchor="center")
+    self.initTotal(contentFrame)
 
-    returnBtn = ttk.Button(checkoutFrame, text="Return to Order", command=lambda: self.transitionFrame(self.initCashierMode))
-    saveBtn = ttk.Button(checkoutFrame, text="Place Order", command=lambda: self.order.saveOrderToDB(self.clientConnection))
+    returnBtn = ttk.Button(contentFrame, text="Return to Order", command=lambda: self.transitionFrame(self.initCashierMode))
+    saveBtn = ttk.Button(contentFrame, text="Place Order", command=lambda: self.order.saveOrderToDB(self.clientConnection))
 
-    returnBtn.pack()
-    saveBtn.pack()
+    saveBtn.pack(pady=10)
+    returnBtn.pack(pady=10)
 
   def cantCheckoutPopUp(self):
     popUp = self.createPopUp(self)
@@ -986,7 +999,7 @@ class Order() :
         clientConnection.sendall(orderInfoToBytes)
       except Exception as e :
         print(f"Error sending data: {e}")
-        
+      
     self.clearAllInstances()
     print("Order saved! New order ready.")
 
