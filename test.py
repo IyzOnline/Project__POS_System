@@ -1,11 +1,2 @@
-import datetime
-order = {}
-
-order["was"] = {
-    "orderID": 1, 
-    "date": datetime.datetime.now(),
-    "items": {
-        "hamburger": ("Hamburger", "meals", 99)
-    }
-    }
-
+deluxe = "50"
+print ("horray " + deluxe + " times!")

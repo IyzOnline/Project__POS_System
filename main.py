@@ -187,7 +187,7 @@ class App(tk.Tk) :
     self.menuLowerBtns.place(relx=0, rely=0.9, relwidth=1.0, relheight=0.1)
 
     createBtn = ttk.Button(self.menuLowerBtns, text="Add Menu Item", command=lambda: self.transitionFrame(self.initCreateMIPage))
-    deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item")
+    deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item", command=lambda: self.transitionFrame(self.initDeleteMIPage))
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
@@ -310,6 +310,9 @@ class App(tk.Tk) :
     contentFrame = tk.Frame(deleteMIFrame, background="#4d4d4d", padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
 
+    deleteTableLbl = ttk.Label(contentFrame, text="Deletion Table")
+    deleteTableLbl.pack(expand=True, anchor="center", pady=10)
+
     self.initDeleteMIColumns(contentFrame)
 
     for recordName, recordValues in self.__MenuItemRecords.items():
@@ -318,7 +321,7 @@ class App(tk.Tk) :
       itemName = ttk.Label(itemRow, text=recordValues["name"], style="Cell.TLabel", anchor="center")
       itemPrice = ttk.Label(itemRow, text=recordValues["price"], style="Cell.TLabel", anchor="center")
       itemCategory = ttk.Label(itemRow, text=recordValues["category"], style="Cell.TLabel", anchor="center")
-      itemDeleteBtn = ttk.Button(itemRow, text="DELETE", style="Cell.TButton", command=self.deleteMenuItem(itemRow, recordValues["name"]))
+      itemDeleteBtn = ttk.Button(itemRow, text="DELETE", style="Cell.TButton", command= lambda rowWidget=itemRow, name=recordName: self.deletionConfirmPopUp(rowWidget, name))
 
       itemRow.grid_columnconfigure(0, weight=1)
       itemRow.grid_columnconfigure(1, weight=1)
@@ -332,9 +335,8 @@ class App(tk.Tk) :
       
       itemRow.pack(fill="x")
 
-    
     returnBtn = ttk.Button(contentFrame, text="Return to Menu", command=lambda: self.transitionFrame(self.initCashierMode))
-    returnBtn.grid()
+    returnBtn.pack(anchor="center", pady=5)
 
   def initDeleteMIColumns(self, parent):
     columns = tk.Frame(parent)
@@ -357,12 +359,12 @@ class App(tk.Tk) :
     columns.pack(fill="x")
 
   def cantDeletePopUp(self):
-    popUp = self.createPopUp()
+    popUp = self.createPopUp(self.mainFrame)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
 
-    ttk.Label(contentFrame, text="Order must first be empty. \nEither cancel current order or return.").pack(pady=10, anchor="center")
-    ttk.Button(contentFrame, text="Cancel Current Order", command=lambda: self.cancelCurrentOrder(popUp)).pack(pady=10, anchor="center")
+    ttk.Label(contentFrame, text="Order must first be empty. \nEither cancel current order to proceed or return.").pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Cancel and Proceed", command=lambda: self.cancelCurrentOrder(popUp)).pack(pady=10, anchor="center")
     ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
 
   def cancelCurrentOrder(self, popUp):
@@ -374,8 +376,21 @@ class App(tk.Tk) :
     popUp.destroy()
     self.transitionFrame(self.initDeleteMIPage)
 
-  def deleteMenuItem(self, itemRow, name) :
-    pass
+  def deleteMenuItem(self, itemRow, name, popUp) :
+    popUp.destroy()
+    itemRow.destroy()
+    self.__cursor.execute("DELETE FROM menu_items WHERE name = ?", (name,))
+    self.commitDBChanges("Deletion of " + name + " done successfully.")
+    del self.__MenuItemRecords[name]
+
+  def deletionConfirmPopUp(self, itemRow, name) :
+    print(name)
+    popUp = self.createPopUp(self.mainFrame)
+    contentFrame = tk.Frame(popUp, padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+    ttk.Label(contentFrame, text=f"Are you sure you want to delete Menu Item '{name}'?").pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Confirm", command=lambda: self.deleteMenuItem(itemRow, name, popUp)).pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Return to Deletion Page", command=popUp.destroy).pack(pady=10, anchor="center")
 
   #Receipt
   def initializeReceipt(self) :
@@ -505,13 +520,13 @@ class App(tk.Tk) :
     ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
 
   #Centralized Pop-Up Creation:
-  def createPopUp(self, parent):
-    popUp = tk.Toplevel(parent, bd=2)
+  def createPopUp(self, parentFrame):
+    popUp = tk.Toplevel(parentFrame, bd=2)
     popUp.title("Notification")
-    parent_x = self.winfo_x()
-    parent_y = self.winfo_y()
-    parent_width = self.winfo_width()
-    parent_height = self.winfo_height()
+    parent_x = parentFrame.winfo_x()
+    parent_y = parentFrame.winfo_y()
+    parent_width = parentFrame.winfo_width()
+    parent_height = parentFrame.winfo_height()
 
     w = 300
     h = 200
@@ -521,7 +536,7 @@ class App(tk.Tk) :
 
     popUp.geometry(f"{w}x{h}+{x}+{y}")
 
-    popUp.transient(parent)
+    popUp.transient(parentFrame)
     popUp.grab_set()
     
     return popUp
