@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import datetime
 import socket
-import pickle
+import json
 import threading
 import os
 from dotenv import load_dotenv
@@ -85,7 +85,7 @@ class App(tk.Tk) :
             print("Server disconnected.")
             break
 
-          self.receivedOrderInfo = pickle.loads(packet)
+          self.receivedOrderInfo = json.loads(packet.decode('utf-8'))
 
           print(f"RECEIVED ORDER: {self.receivedOrderInfo}")
       except ConnectionRefusedError :
@@ -590,7 +590,7 @@ class App(tk.Tk) :
     self.initTotal(checkoutFrame)
 
     returnBtn = ttk.Button(checkoutFrame, text="Return to Order", command=lambda: self.transitionFrame(self.initCashierMode))
-    saveBtn = ttk.Button(checkoutFrame, text="Place Order", command=self.order.saveOrderToDB)
+    saveBtn = ttk.Button(checkoutFrame, text="Place Order", command=lambda: self.order.saveOrderToDB(self.client_connection))
 
     returnBtn.pack()
     saveBtn.pack()
@@ -784,7 +784,7 @@ class MenuItem(tk.Frame) :
     self.__price = tk.DoubleVar(value=MenuItemRecord['price'])
     self.__category = tk.StringVar(value=MenuItemRecord['category'])
 
-    self.__quantity = tk.DoubleVar(value=initQuantity)
+    self.__quantity = tk.IntVar(value=initQuantity)
 
     self.nameLbl = ttk.Label(self, textvariable=self.__name, style="Cell.TLabel")
     self.priceLbl = ttk.Label(self, textvariable=self.__price, style="Cell.TLabel")
@@ -917,10 +917,14 @@ class Order() :
     else:
       self.orderNum = 1
 
-  def saveOrderToDB(self) :
+  def saveOrderToDB(self, client_connection) :
     if not self.__ItemsInOrder:
       print("Order is empty!")
       return 
+    
+    data = {
+      self.orderNum: {}
+    }
 
     dateTimeOrder = datetime.datetime.now().isoformat()
     self.__cursor.execute("INSERT INTO orders (date) VALUES (?)", (dateTimeOrder,))
@@ -929,11 +933,19 @@ class Order() :
 
     for key, value in self.__ItemsInOrder.items():
       self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?, ?, ?)", (self.orderNum, *value))
+      data[self.orderNum][value[0]] = (value[0], value[3])
 
     self.commitDBChanges("Saved items in receipt to order_items table in DB.")
+    print(f"Data to be transferred: {data}")
 
+    #if client_connection :
+    #  try :
+    #    orderInfoToBytes = json.dumps(data).encode('utf-8')
+    #    client_connection.sendall(orderInfoToBytes)
+    #  except Exception as e :
+    #    print(f"Error sending data: {e}")
+        
     self.clearAllInstances()
-
     print("Order saved! New order ready.")
 
 app = App()
