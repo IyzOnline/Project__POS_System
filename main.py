@@ -280,13 +280,18 @@ class App(tk.Tk) :
     def passData():
       if not (nameEntry.get() and priceEntry.get() and categoryEntry.get()) :
         return None
-      #add int/double checker and adjust DB to store double instead of INT for price
       
-      data = (nameEntry.get().strip(), 
-              float(priceEntry.get()), 
-              categoryEntry.get().strip()
-            )
+      name = nameEntry.get().strip()
+      price = 0
+      category = categoryEntry.get().strip()
+
+      try : 
+        price = float(priceEntry.get())
+      except ValueError :
+        return "ValueError"
       
+      data = (name, price, category)
+
       nameEntry.delete(0, tk.END)
       priceEntry.delete(0, tk.END)
       categoryEntry.delete(0, tk.END)
@@ -626,8 +631,12 @@ class App(tk.Tk) :
 
   def addMenuItem(self, data) :
     if not data:
-      self.emptyFieldsPopUp()
+      self.fieldsErrorPopUp("Fields must have proper input.")
       return
+    elif data == "ValueError" :
+      self.fieldsErrorPopUp("Input for price must be a real number.")
+      return
+
     
     print(f"Here is data in adding: {data}")
     self.__cursor.execute("INSERT INTO menu_items (name, price, category) VALUES (?, ?, ?)", data)
@@ -642,11 +651,11 @@ class App(tk.Tk) :
 
     self.commitDBChanges("d: prototype data saved to menu_items table in DB")
 
-  def emptyFieldsPopUp(self) :
+  def fieldsErrorPopUp(self, message) :
     popUp = self.createPopUp(self.mainFrame)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
-    ttk.Label(contentFrame, text="Fields cannot be empty.").pack(pady=10, anchor="center")
+    ttk.Label(contentFrame, text=message).pack(pady=10, anchor="center")
     ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
 
   def removeMenuItem(self) :
