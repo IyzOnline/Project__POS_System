@@ -283,7 +283,7 @@ class App(tk.Tk) :
       #add int/double checker and adjust DB to store double instead of INT for price
       
       data = (nameEntry.get().strip(), 
-              int(priceEntry.get()), 
+              float(priceEntry.get()), 
               categoryEntry.get().strip()
             )
       
@@ -710,10 +710,10 @@ class MenuItem(tk.Frame) :
     self.initStyles()
 
     self.__name = tk.StringVar(value=MenuItemRecord['name'])
-    self.__price = tk.IntVar(value=MenuItemRecord['price'])
+    self.__price = tk.DoubleVar(value=MenuItemRecord['price'])
     self.__category = tk.StringVar(value=MenuItemRecord['category'])
 
-    self.__quantity = tk.IntVar(value=initQuantity)
+    self.__quantity = tk.DoubleVar(value=initQuantity)
 
     self.nameLbl = ttk.Label(self, textvariable=self.__name, style="Cell.TLabel")
     self.priceLbl = ttk.Label(self, textvariable=self.__price, style="Cell.TLabel")
