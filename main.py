@@ -27,6 +27,13 @@ class App(tk.Tk) :
     self.initializeMainFrame()
     self.initCashierMode()
 
+#Networking
+  def connectToKitchen(self) :
+    print("Connected to Kitchen!")
+
+  def connectToCashier(self) :
+    print("Connected to Cashier!")
+
 #UI Implementation
   def initStyles(self) :
     self.style = ttk.Style()
@@ -84,10 +91,18 @@ class App(tk.Tk) :
   
   #Kitchen Mode
   def initKitchenMode(self) :
-    kitchenOrdersFrame = tk.Frame(self.mainFrame, padx=10, pady=10, background="#ffffff")
-    kitchenOrdersFrame.pack()
-    tempLbl = tk.Label(kitchenOrdersFrame, text="KITCHEN MODE")
-    tempLbl.pack()
+    kitchenModeFrame = tk.Frame(self.mainFrame, background="#333333")
+    kitchenModeFrame.pack(expand=True, fill="both", padx=2, pady=2)
+    
+    kitchenModeLbl = ttk.Label(kitchenModeFrame, text="KITCHEN MODE")
+    kitchenModeLbl.pack(pady=20)
+
+    kitchenOrdersFrame = tk.Frame(kitchenModeFrame, background="#4d4d4d", highlightbackground="white", highlightthickness=2)
+    kitchenOrdersFrame.pack(expand=True, fill="both", padx=10, pady=10)
+
+    if not kitchenOrdersFrame.winfo_children():
+      connectToCashierBtn = ttk.Button(kitchenOrdersFrame, text="Connect to Cashier PC", command=self.connectToCashier)
+      connectToCashierBtn.pack(pady=20)
 
   #History Page
   def initHistoryPage(self) :
@@ -148,7 +163,6 @@ class App(tk.Tk) :
         quantityCol = ttk.Label(orderItemRow, text=orderItemData["quantity"], style="Cell.TLabel", anchor="center")
 
         total = orderItemData['quantity'] * orderItemData['price']
-        print(total)
 
         totalCol = ttk.Label(orderItemRow, text=f"₱{total:.2f}", style="Cell.TLabel", anchor="center")
 
@@ -190,9 +204,11 @@ class App(tk.Tk) :
 
     createBtn = ttk.Button(self.menuLowerBtns, text="Add Menu Item", command=lambda: self.transitionFrame(self.initCreateMIPage))
     deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item", command=self.cantDeletePopUp)
+    connectToKitchenBtn = ttk.Button(self.menuLowerBtns, text="Connect to Kitchen PC", command = self.connectToKitchen)
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    connectToKitchenBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
     self.initMenuTableColumns()
     self.initializeMenuItems(None)
