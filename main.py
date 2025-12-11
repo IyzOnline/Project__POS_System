@@ -4,6 +4,9 @@ import sqlite3
 from pathlib import Path
 import sys
 import datetime
+import socket
+import pickle
+import threading
 
 class App(tk.Tk) :
   def __init__(self):
@@ -15,6 +18,7 @@ class App(tk.Tk) :
     self.initializeExitFS()
     self.initDB()
 
+    self.client_connection = None
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
@@ -29,10 +33,38 @@ class App(tk.Tk) :
 
 #Networking
   def connectToKitchen(self) :
+    self.connectToKitchenBtn.config(state=tk.DISABLED)
+    self.startServerThread()
     print("Connected to Kitchen!")
 
   def connectToCashier(self) :
+    self.startClientThread()
+    self.connectToCashierBtn.config(state=tk.DISABLED)
     print("Connected to Cashier!")
+
+  def startServerThread(self) :
+    serverThread = threading.Thread(target=self.runCashierServer)
+    serverThread.daemon = True
+    serverThread.start()
+
+  def runCashierServer(self) :
+    SERVER_IP = '0.0.0.0'
+    PORT = 65432
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serverSocket:
+      serverSocket.bind((SERVER_IP, PORT))
+      serverSocket.listen()
+
+      conn, addr = serverSocket.accept()
+
+      self.client_connection = conn
+      self.connectToKitchenBtn.config(state=tk.NORMAL)
+
+  def startClientThread(self) :
+    pass
+
+  def runKitchenClient(self) :
+    pass
 
 #UI Implementation
   def initStyles(self) :
@@ -101,8 +133,8 @@ class App(tk.Tk) :
     kitchenOrdersFrame.pack(expand=True, fill="both", padx=10, pady=10)
 
     if not kitchenOrdersFrame.winfo_children():
-      connectToCashierBtn = ttk.Button(kitchenOrdersFrame, text="Connect to Cashier PC", command=self.connectToCashier)
-      connectToCashierBtn.pack(pady=20)
+      self.connectToCashierBtn = ttk.Button(kitchenOrdersFrame, text="Connect to Cashier PC", command=lambda: self.connectToCashier())
+      self.connectToCashierBtn.pack(pady=20)
 
   #History Page
   def initHistoryPage(self) :
@@ -204,11 +236,11 @@ class App(tk.Tk) :
 
     createBtn = ttk.Button(self.menuLowerBtns, text="Add Menu Item", command=lambda: self.transitionFrame(self.initCreateMIPage))
     deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item", command=self.cantDeletePopUp)
-    connectToKitchenBtn = ttk.Button(self.menuLowerBtns, text="Connect to Kitchen PC", command = self.connectToKitchen)
+    self.connectToKitchenBtn = ttk.Button(self.menuLowerBtns, text="Connect to Kitchen PC", command = lambda: self.connectToKitchen())
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
-    connectToKitchenBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    self.connectToKitchenBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
     self.initMenuTableColumns()
     self.initializeMenuItems(None)
@@ -875,18 +907,6 @@ class Order() :
     self.clearAllInstances()
 
     print("Order saved! New order ready.")
-
-  def reduceFromOrder(self, itemName):
-    pass
-
-  def deleteFromOrder(self, itemName):
-    pass
-
-  def deleteEntireOrder(self):
-    pass
-
-  def cancelOrder(self):
-    pass
 
 app = App()
 app.mainloop()
