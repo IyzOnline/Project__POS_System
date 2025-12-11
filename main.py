@@ -35,6 +35,8 @@ class App(tk.Tk) :
                     relief="solid", 
                     borderwidth=2, 
                     bg="lightgray",
+                    wraplength=200, 
+                    justify=tk.CENTER
                     )
     
     self.style.configure("Cell.TButton",
@@ -187,7 +189,7 @@ class App(tk.Tk) :
     self.menuLowerBtns.place(relx=0, rely=0.9, relwidth=1.0, relheight=0.1)
 
     createBtn = ttk.Button(self.menuLowerBtns, text="Add Menu Item", command=lambda: self.transitionFrame(self.initCreateMIPage))
-    deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item", command=lambda: self.transitionFrame(self.initDeleteMIPage))
+    deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item", command=self.cantDeletePopUp)
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
@@ -300,10 +302,6 @@ class App(tk.Tk) :
     returnBtn.pack(anchor="center", pady=5)
 
   def initDeleteMIPage(self) :
-    if self.__MenuItemInstances:
-      self.cantDeletePopUp()
-      return
-    
     deleteMIFrame = tk.Frame(self.mainFrame, background="#333333")
     deleteMIFrame.pack(expand=True, fill="both", anchor=tk.CENTER)
 
@@ -359,13 +357,16 @@ class App(tk.Tk) :
     columns.pack(fill="x")
 
   def cantDeletePopUp(self):
-    popUp = self.createPopUp(self.mainFrame)
-    contentFrame = tk.Frame(popUp, padx=10, pady=10)
-    contentFrame.pack(expand=True, anchor="center")
+    if self.__MenuItemInstances:
+      popUp = self.createPopUp(self.mainFrame)
+      contentFrame = tk.Frame(popUp, padx=10, pady=10)
+      contentFrame.pack(expand=True, anchor="center")
 
-    ttk.Label(contentFrame, text="Order must first be empty. \nEither cancel current order to proceed or return.").pack(pady=10, anchor="center")
-    ttk.Button(contentFrame, text="Cancel and Proceed", command=lambda: self.cancelCurrentOrder(popUp)).pack(pady=10, anchor="center")
-    ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
+      ttk.Label(contentFrame, text="Order must first be empty.\nEither Cancel Current Order to Proceed or Return to Order.", wraplength=200, justify=tk.CENTER).pack(pady=10, anchor="center")
+      ttk.Button(contentFrame, text="Cancel and Proceed", command=lambda: self.cancelCurrentOrder(popUp)).pack(pady=10, anchor="center")
+      ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
+    else :
+      self.transitionFrame(self.initDeleteMIPage)
 
   def cancelCurrentOrder(self, popUp):
     self.__MenuItemInstances = {}
