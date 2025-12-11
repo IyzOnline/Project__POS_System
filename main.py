@@ -567,7 +567,7 @@ class App(tk.Tk) :
                           CREATE TABLE IF NOT EXISTS menu_items (
                             menuItemID INTEGER PRIMARY KEY AUTOINCREMENT,
                             name TEXT UNIQUE NOT NULL,
-                            price INTEGER NOT NULL,
+                            price REAL NOT NULL,
                             category TEXT NOT NULL
                           )
                           """)
@@ -584,7 +584,7 @@ class App(tk.Tk) :
                             itemID INTEGER PRIMARY KEY AUTOINCREMENT, 
                             orderID INTEGER,
                             name TEXT NOT NULL,
-                            price INTEGER NOT NULL,
+                            price REAL NOT NULL,
                             category TEXT NOT NULL,
                             quantity INTEGER,
                             FOREIGN KEY(orderID) REFERENCES orders(orderID)
