@@ -21,7 +21,7 @@ class App(tk.Tk) :
     self.initDB()
 
     self.client_connection = None
-    self.receivedOrderInfo = None
+    self.__receivedOrderInfo = None
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
@@ -88,9 +88,9 @@ class App(tk.Tk) :
             print("Server disconnected.")
             break
 
-          self.receivedOrderInfo = json.loads(packet.decode('utf-8'))
+          self.__receivedOrderInfo = json.loads(packet.decode('utf-8'))
 
-          print(f"RECEIVED ORDER: {self.receivedOrderInfo}")
+          print(f"RECEIVED ORDER: {self.__receivedOrderInfo}")
       except ConnectionRefusedError :
         print("Could not connect. Is the server listening?")
         self.connectToCashierBtn.config(state=tk.NORMAL)
@@ -160,16 +160,38 @@ class App(tk.Tk) :
     kitchenModeLbl = ttk.Label(kitchenModeFrame, text="KITCHEN MODE")
     kitchenModeLbl.pack(pady=20)
 
-    kitchenOrdersFrame = tk.Frame(kitchenModeFrame, background="#4d4d4d", highlightbackground="white", highlightthickness=2)
-    kitchenOrdersFrame.pack(expand=True, fill="both", padx=10, pady=10)
+    self.kitchenOrdersFrame = tk.Frame(kitchenModeFrame, background="#4d4d4d", highlightbackground="white", highlightthickness=2)
+    self.kitchenOrdersFrame.pack(expand=True, fill="both", padx=10, pady=10)
 
-    if not kitchenOrdersFrame.winfo_children():
-      self.connectToCashierBtn = ttk.Button(kitchenOrdersFrame, text="Connect to Cashier PC", command=lambda: self.connectToCashier())
-      kitchenOrdersFrame.grid_columnconfigure(0, weight=1)
-      self.connectToCashierBtn.grid(column=0, row=0)
+    self.connectToCashierBtn = ttk.Button(kitchenModeFrame, text="Connect to Cashier PC", command=lambda: self.connectToCashier())
+    self.connectToCashierBtn.pack(pady=20, anchor="center")
+
+    if not self.kitchenOrdersFrame.winfo_children():
+      tempKitchenOrderLbl = ttk.Label(self.kitchenOrdersFrame, text="Waiting for orders...")
+      tempKitchenOrderLbl.pack()
+      #self.kitchenOrdersFrame.grid_columnconfigure(0, weight=1)
+      #tempKitchenOrderLbl.grid(column=0, row=0, pady=10)
 
   def displayKitchenOrderInstance(self) :
-    pass
+    instanceFrame = tk.Frame(self.kitchenOrdersFrame, width=200, height=300)
+
+    for orderNum, orderItems in self.__receivedOrderInfo.items() :
+      tk.Label(instanceFrame, text=f"Order {orderNum}").pack()
+      for itemName, itemData in orderItems.items():
+        itemRowFrame = tk.Frame(instanceFrame)
+        name = itemData[0]
+        quantity = itemData[2]
+        tk.Label(itemRowFrame, text=name).pack(side="left", padx=10)
+        tk.Label(itemRowFrame, text=quantity).pack(side="right", pady=10)
+        itemRowFrame.pack(fill="x", expand=True)
+
+    buttonFrame = tk.Frame(instanceFrame)
+    buttonFrame.pack(fill="x", expand=True)
+
+    tk.Button(buttonFrame, text="Completed", command=instanceFrame.destroy).pack(side="left", padx=10)
+    tk.Button(buttonFrame, text="Cancelled", command=instanceFrame.destroy).pack(side="right", pady=10)
+
+    instanceFrame.pack()
 
   #History Page
   def initHistoryPage(self) :
@@ -940,7 +962,7 @@ class Order() :
 
     for key, value in self.__ItemsInOrder.items():
       self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?, ?, ?)", (self.orderNum, *value))
-      data[self.orderNum][value[0]] = (value[0], value[3])
+      data[self.orderNum][value[0]] = [value[0], value[3]]
 
     self.commitDBChanges("Saved items in receipt to order_items table in DB.")
     print(f"Data to be transferred: {data}")
