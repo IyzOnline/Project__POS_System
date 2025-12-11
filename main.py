@@ -219,7 +219,7 @@ class App(tk.Tk) :
     
     columns.pack(fill="x")
 
-  def initializeMenuItems(self) :
+  def initializeMenuItems(self, searchString) :
     self.empty = None
     if (len(self.__MenuItemRecords) == 0):
       if not self.initMenuItemsfromDB():
@@ -229,14 +229,14 @@ class App(tk.Tk) :
       if (self.empty) :
         self.empty.destroy()
     
-    for index, (recordName, recordValues) in enumerate(self.__MenuItemRecords.items()):
+    for recordName, recordValues in self.__MenuItemRecords.items():
       #print(recordValues)
       #print(f"Here are all the saved item quantities: {self.__SavedItemQuantity}")
       if recordName in self.__SavedItemQuantity :
         updatedQuantity = self.__SavedItemQuantity[recordName].get()
-        item = MenuItem(self.menuTable, self, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
+        item = MenuItem(self.menuTable, self, recordValues, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
       else :
-        item = MenuItem(self.menuTable, self, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, 0)
+        item = MenuItem(self.menuTable, self, recordValues, self.__MenuItemInstances, self.updateReceiptArea, 0)
       
       self.__SavedItemQuantity[recordName] = item.quantity
       item.pack(fill="x")
@@ -651,14 +651,13 @@ class App(tk.Tk) :
 
 
 class MenuItem(tk.Frame) :
-  def __init__(self, parent, root, MenuItemRecord, count, MenuItemInstances, updateReceiptArea, initQuantity) :
+  def __init__(self, parent, root, MenuItemRecord, MenuItemInstances, updateReceiptArea, initQuantity) :
     self.__MenuItemInstances = MenuItemInstances
     self.updateReceiptArea = updateReceiptArea
     self.root = root
     super().__init__(parent)
     self.initStyles()
 
-    print(f"Count: " + str(count))
     self.__name = tk.StringVar(value=MenuItemRecord['name'])
     self.__price = tk.IntVar(value=MenuItemRecord['price'])
     self.__category = tk.StringVar(value=MenuItemRecord['category'])
