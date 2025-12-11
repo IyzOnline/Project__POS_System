@@ -37,7 +37,7 @@ class App(tk.Tk) :
 #Networking
   def connectToKitchen(self) :
     self.connectToKitchenBtn.config(state=tk.DISABLED)
-    self.connectionLbl.config(text="Status: Connecting to Kitchen...")
+    self.connectionLbl.config(text="Status: Connecting to Kitchen...", fg="orange")
     self.startServerThread()
 
   def connectToCashier(self) :
@@ -61,7 +61,7 @@ class App(tk.Tk) :
 
         self.client_connection = conn
         self.connectToKitchenBtn.config(state=tk.NORMAL)
-        self.connectionLbl.config(text="Status: Connected to Kitchen.", background="green")
+        self.connectionLbl.config(text="Status: Connected to Kitchen.", fg="green")
         print("Connected to Kitchen!")
     except Exception as e :
       print(f"Server Error: {e}")
@@ -272,7 +272,7 @@ class App(tk.Tk) :
     createBtn = ttk.Button(self.menuLowerBtns, text="Add Menu Item", command=lambda: self.transitionFrame(self.initCreateMIPage))
     deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item", command=self.cantDeletePopUp)
     self.connectToKitchenBtn = ttk.Button(self.menuLowerBtns, text="Connect to Kitchen PC", command = lambda: self.connectToKitchen())
-    self.connectionLbl = tk.Label(self.menuLowerBtns, text="Status: Not Connected to Kitchen...")
+    self.connectionLbl = tk.Label(self.menuLowerBtns, text="Status: Not Connected to Kitchen...", fg="red")
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
