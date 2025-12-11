@@ -281,6 +281,71 @@ class App(tk.Tk) :
     saveBtn.pack(anchor="center", pady=5)
     returnBtn.pack(anchor="center", pady=5)
 
+  def initDeleteMIPage(self) :
+    if self.__MenuItemInstances:
+      self.cantDeletePopUp()
+      return
+    
+    deleteMIFrame = tk.Frame(self.mainFrame, background="#333333")
+    deleteMIFrame.pack(expand=True, fill="both", anchor=tk.CENTER)
+
+    contentFrame = tk.Frame(deleteMIFrame, background="#4d4d4d", padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+
+    self.initDeleteMIColumns(contentFrame)
+
+    for index, (recordName, recordValues) in enumerate(self.__MenuItemRecords.items()):
+      if recordName in self.__SavedItemQuantity :
+        updatedQuantity = self.__SavedItemQuantity[recordName].get()
+        item = MenuItem(contentFrame, self, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
+      else :
+        item = MenuItem(contentFrame, self, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, 0)
+      
+      self.__SavedItemQuantity[recordName] = item.quantity
+      item.pack(fill="x")
+
+    
+    returnBtn = ttk.Button(contentFrame, text="Return to Menu", command=lambda: self.transitionFrame(self.initCashierMode))
+    returnBtn.grid()
+
+  def initDeleteMIColumns(self, parent):
+    columns = tk.Frame(parent)
+    
+    nameCol = ttk.Label(columns, text="Name", style="Cell.TLabel", anchor="center")
+    priceCol = ttk.Label(columns, text="Price", style="Cell.TLabel", anchor="center")
+    categoryCol = ttk.Label(columns, text="Category", style="Cell.TLabel", anchor="center")
+    deleteCol = ttk.Label(columns, text="Delete Menu Item", style="Cell.TButton", anchor="center")
+
+    columns.grid_columnconfigure(0, weight=1)
+    columns.grid_columnconfigure(1, weight=1)
+    columns.grid_columnconfigure(2, weight=1)
+    columns.grid_columnconfigure(3, weight=1)
+
+    nameCol.grid(column=0, row=0, sticky="nsew")
+    priceCol.grid(column=1, row=0, sticky="nsew")
+    categoryCol.grid(column=2, row=0, sticky="nsew")
+    deleteCol.grid(column=3, row=0, sticky="nsew")
+    
+    columns.pack(fill="x")
+
+  def cantDeletePopUp(self):
+    popUp = self.createPopUp()
+    contentFrame = tk.Frame(popUp, padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+
+    ttk.Label(contentFrame, text="Order must first be empty. \nEither cancel current order or return.").pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Cancel Current Order", command=lambda: self.cancelCurrentOrder(popUp)).pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
+
+  def cancelCurrentOrder(self, popUp):
+    self.__MenuItemInstances = {}
+    self.__SavedItemQuantity = {}
+    self.__ReceiptListInstances = {}
+    self.total = tk.DoubleVar(value=0)
+    self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
+    popUp.destroy()
+    self.transitionFrame(self.initDeleteMIPage)
+
   def transitionFrame(self, initNewPage) :
     self.mainFrame.destroy()
     self.clearReceiptInstances()
