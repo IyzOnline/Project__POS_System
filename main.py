@@ -165,7 +165,11 @@ class App(tk.Tk) :
 
     if not kitchenOrdersFrame.winfo_children():
       self.connectToCashierBtn = ttk.Button(kitchenOrdersFrame, text="Connect to Cashier PC", command=lambda: self.connectToCashier())
-      self.connectToCashierBtn.pack(pady=20)
+      kitchenOrdersFrame.grid_columnconfigure(0, weight=1)
+      self.connectToCashierBtn.grid(column=0, row=0)
+
+  def displayKitchenOrderInstance(self) :
+    pass
 
   #History Page
   def initHistoryPage(self) :
