@@ -187,7 +187,7 @@ class App(tk.Tk) :
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
 
     self.initMenuTableColumns()
-    self.initializeMenuItems()
+    self.initializeMenuItems(None)
     self.initializeSearchArea()
 
   def initializeSearchArea(self) :
@@ -225,30 +225,38 @@ class App(tk.Tk) :
       if not self.initMenuItemsfromDB():
         self.empty = tk.Label(self.menuTable, text="No records exist.")
         self.empty.pack(expand=True, fill="both")
-    else :
-      if (self.empty) :
-        self.empty.destroy()
+    #else :
+    #  if (self.empty) :
+    #   self.empty.destroy()
     
     for recordName, recordValues in self.__MenuItemRecords.items():
-      #print(recordValues)
-      #print(f"Here are all the saved item quantities: {self.__SavedItemQuantity}")
+      if searchString and searchString.strip().lower() not in recordValues["name"].lower() :
+        continue
+
+      initialQuantity = 0
       if recordName in self.__SavedItemQuantity :
-        updatedQuantity = self.__SavedItemQuantity[recordName].get()
-        item = MenuItem(self.menuTable, self, recordValues, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
-      else :
-        item = MenuItem(self.menuTable, self, recordValues, self.__MenuItemInstances, self.updateReceiptArea, 0)
-      
+        initialQuantity = self.__SavedItemQuantity[recordName].get()
+
+      item = MenuItem(
+        self.menuTable, 
+        self, recordValues, 
+        self.__MenuItemInstances, 
+        self.updateReceiptArea, 
+        initialQuantity
+      )
+
       self.__SavedItemQuantity[recordName] = item.quantity
       item.pack(fill="x")
-
+      
   def initCreateMIPage(self) :
     def passData():
-      if not (nameEntry.get() and priceEntry.get() and categoryEntry.get()):
+      if not (nameEntry.get() and priceEntry.get() and categoryEntry.get()) :
         return None
+      #add int/double checker and adjust DB to store double instead of INT for price
       
-      data = (nameEntry.get(), 
+      data = (nameEntry.get().strip(), 
               int(priceEntry.get()), 
-              categoryEntry.get()
+              categoryEntry.get().strip()
             )
       
       nameEntry.delete(0, tk.END)
