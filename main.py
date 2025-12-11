@@ -511,7 +511,7 @@ class App(tk.Tk) :
 
   def deletionConfirmPopUp(self, itemRow, name) :
     print(name)
-    popUp = self.createPopUp(self.mainFrame)
+    popUp = self.createPopUp(self)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
     ttk.Label(contentFrame, text=f"Are you sure you want to delete Menu Item '{name}'?").pack(pady=10, anchor="center")
@@ -645,12 +645,20 @@ class App(tk.Tk) :
     self.initTotal(contentFrame)
 
     returnBtn = ttk.Button(contentFrame, text="Return to Order", command=lambda: self.transitionFrame(self.initCashierMode))
-    saveBtn = ttk.Button(contentFrame, text="Place Order", command=lambda: self.order.saveOrderToDB(self.clientConnection))
+    saveBtn = ttk.Button(contentFrame, text="Place Order", command=self.successfulOrderSavePopUp)
 
     saveBtn.pack(pady=10)
     returnBtn.pack(pady=10)
 
-  def cantCheckoutPopUp(self):
+  def successfulOrderSavePopUp(self) :
+    self.order.saveOrderToDB(self.clientConnection)
+    popUp = self.createPopUp(self)
+    contentFrame = tk.Frame(popUp, padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+    ttk.Label(contentFrame, text="Order Saved Successfully").pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
+
+  def cantCheckoutPopUp(self) :
     popUp = self.createPopUp(self)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
