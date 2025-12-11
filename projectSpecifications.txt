@@ -1,0 +1,64 @@
+Default Program Flow:
+1. New Order instance is created.
+2. Items are added/reduced/removed from the order instance.
+3. Order is saved.
+
+QUESTION ONE: What exactly happens when the program first opens?
+- It reads the file containing the list of MENU ITEMS and updates the global list in the application which contains
+pairs of name and price.
+- Then, a new instance of the order class is created.
+
+QUESTION TWO: What exactly happpens when items are added/reduced/removed from the order instance?
+
+- Each menu item has [+] OR [-] buttons associated with them. When a button is pressed, what happens?
+Proposal 1:
+I'll use an ORDER CLASS and an ITEM CLASS. The order class keeps a list of key-value pairs that is initially empty.
+
+The KEY is the name of the menu item and the value is the count (ex. Hamburger - 3, which indicates 3 hamburgers).
+
+There is a global list of names and prices.
+
+When the add or subtract button associated to an item is pressed, a method in the ORDER CLASS named addCount and 
+reduceCount is executed that utilizes the KEY of a menu item to add/reduce the count accordingly.
+
+- I like this proposal, so we'll settle on it.
+
+QUSETION THREE: What exactly happens when NEW MENU ITEMS are added to the program?
+Proposal 1:
+The details of the new menu item is saved in sqlite3. The details are:
+(1) itemName
+(2) price
+(3) imagePath
+
+The global list of names and prices are updated. UI is also updated.
+
+QUESTION FOUR: What exactly happens when you DELETE MENU ITEMS?
+Proposal 1:
+Details of the menu item are deleted from the table. The image is also deleted from the Images file.
+
+The global list of names and prices are updated. UI is also updated.
+
+QUESTION FIVE: What happens when you finalize the order?
+Proposal 1:
+Details of the order are saved to a file using sqlite3. Specifically, these details are saved:
+(1) - Order Number ID (INCREMENTED)
+(2) - date
+(3) - Total
+
+Details of the items included in that order is saved to a DIFFERENT file using sqlite3. Each item is saved in its own row.
+Specifically, these details are saved:
+(1) - Order Item ID (INCREMENTED)
+(2) - name
+(3) - price
+(4) - count OR quantity
+(5) - order_id foreignkey
+
+QUESTION SIX: What happens when we open up the HISTORY page?
+Proposal 1:
+A table will be created, where the columns would be:
+Date - Order ID/Num - Item 1 Count - ... - Item N Count - Total
+
+Where N is the total number of items in the menu.
+
+Proposal 2:
+Same as Proposal 1, but with the added function of sorting by the day, week, and month.
