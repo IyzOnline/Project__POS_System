@@ -192,12 +192,16 @@ class App(tk.Tk) :
 
   def initializeSearchArea(self) :
     self.searchValue = tk.StringVar()
-    self.searchValue.trace_add("write", self.searchThroughRecords)
+    self.searchValue.trace_add("write", lambda *args: self.searchThroughRecords(self.searchValue.get()))
     searchEntry = ttk.Entry(self.menuSearch, textvariable=self.searchValue, width=60, font=("Helvetica", 14))
     searchEntry.pack(expand=True)
 
-  def searchThroughRecords(self, *args) :
-    print("Records Searched!")
+  def searchThroughRecords(self, searchString) :
+    print(f"Current search string: {searchString}")
+    for row in self.menuTable.winfo_children() :
+      row.destroy()
+    self.initializeMenuItems(searchString)
+    print("Search complete.")
 
   def initMenuTableColumns(self) :
     columns = tk.Frame(self.menuTable)
