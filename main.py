@@ -7,6 +7,8 @@ import datetime
 import socket
 import pickle
 import threading
+import os
+from dotenv import load_dotenv
 
 class App(tk.Tk) :
   def __init__(self):
@@ -19,6 +21,7 @@ class App(tk.Tk) :
     self.initDB()
 
     self.client_connection = None
+    self.receivedOrderInfo = None
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
@@ -34,12 +37,13 @@ class App(tk.Tk) :
 #Networking
   def connectToKitchen(self) :
     self.connectToKitchenBtn.config(state=tk.DISABLED)
+    self.connectionLbl.config(text="Status: Connecting to Kitchen...")
     self.startServerThread()
     print("Connected to Kitchen!")
 
   def connectToCashier(self) :
-    self.startClientThread()
     self.connectToCashierBtn.config(state=tk.DISABLED)
+    self.startClientThread()
     print("Connected to Cashier!")
 
   def startServerThread(self) :
@@ -59,13 +63,36 @@ class App(tk.Tk) :
 
       self.client_connection = conn
       self.connectToKitchenBtn.config(state=tk.NORMAL)
+      self.connectionLbl.config(text="Status: Connected to Kitchen.", background="green")
 
   def startClientThread(self) :
-    pass
+    serverThread = threading.Thread(target=self.runKitchenClient)
+    serverThread.daemon = True
+    serverThread.start()
 
   def runKitchenClient(self) :
-    pass
+    load_dotenv()
+    targetIP = os.getenv("IP_ADDRESS")
+    targetPORT = 65432
 
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
+      try :
+        clientSocket.connect((targetIP, targetPORT))
+        packet = clientSocket.recv(4096)
+
+        while True :
+          if not packet :
+            print("Server disconnected.")
+            break
+
+          self.receivedOrderInfo = pickle.loads(packet)
+
+          print(f"RECEIVED ORDER: {self.receivedOrderInfo}")
+      except ConnectionRefusedError :
+        print("Could not connect. Is the server listening?")
+      except Exception as e :
+        print(f"An error occurred: {e}")
+    
 #UI Implementation
   def initStyles(self) :
     self.style = ttk.Style()
@@ -237,10 +264,12 @@ class App(tk.Tk) :
     createBtn = ttk.Button(self.menuLowerBtns, text="Add Menu Item", command=lambda: self.transitionFrame(self.initCreateMIPage))
     deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item", command=self.cantDeletePopUp)
     self.connectToKitchenBtn = ttk.Button(self.menuLowerBtns, text="Connect to Kitchen PC", command = lambda: self.connectToKitchen())
+    self.connectionLbl = tk.Label(self.menuLowerBtns, text="Status: Not Connected to Kitchen...")
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
     self.connectToKitchenBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    self.connectionLbl.pack(side=tk.LEFT, padx=5, pady=5)
 
     self.initMenuTableColumns()
     self.initializeMenuItems(None)
@@ -742,7 +771,6 @@ class App(tk.Tk) :
     self.mainFrame.destroy()
     self.initializeMainFrame()
     self.initCashierMode()
-
 
 class MenuItem(tk.Frame) :
   def __init__(self, parent, root, MenuItemRecord, MenuItemInstances, updateReceiptArea, initQuantity) :
