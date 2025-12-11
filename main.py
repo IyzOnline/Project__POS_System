@@ -58,6 +58,12 @@ class App(tk.Tk) :
   def exit_fullscreen(self, event=None) :
     self.attributes('-fullscreen', False)
 
+  def transitionFrame(self, initNewPage) :
+    self.mainFrame.destroy()
+    self.clearReceiptInstances()
+    self.initializeMainFrame()
+    initNewPage()
+
   #Main Frame
   def initializeMainFrame(self) :
     self.mainFrame = tk.Frame(self, bg="#ffffff")
@@ -306,15 +312,25 @@ class App(tk.Tk) :
 
     self.initDeleteMIColumns(contentFrame)
 
-    for index, (recordName, recordValues) in enumerate(self.__MenuItemRecords.items()):
-      if recordName in self.__SavedItemQuantity :
-        updatedQuantity = self.__SavedItemQuantity[recordName].get()
-        item = MenuItem(contentFrame, self, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, updatedQuantity)
-      else :
-        item = MenuItem(contentFrame, self, recordValues, index, self.__MenuItemInstances, self.updateReceiptArea, 0)
+    for recordName, recordValues in self.__MenuItemRecords.items():
+      itemRow = tk.Frame(contentFrame)
+
+      itemName = ttk.Label(itemRow, text=recordValues["name"], style="Cell.TLabel", anchor="center")
+      itemPrice = ttk.Label(itemRow, text=recordValues["price"], style="Cell.TLabel", anchor="center")
+      itemCategory = ttk.Label(itemRow, text=recordValues["category"], style="Cell.TLabel", anchor="center")
+      itemDeleteBtn = ttk.Button(itemRow, text="DELETE", style="Cell.TButton", command=self.deleteMenuItem(itemRow, recordValues["name"]))
+
+      itemRow.grid_columnconfigure(0, weight=1)
+      itemRow.grid_columnconfigure(1, weight=1)
+      itemRow.grid_columnconfigure(2, weight=1)
+      itemRow.grid_columnconfigure(3, weight=1)
+
+      itemName.grid(column=0, row=0, sticky="nsew")
+      itemPrice.grid(column=1, row=0, sticky="nsew")
+      itemCategory.grid(column=2, row=0, sticky="nsew")
+      itemDeleteBtn.grid(column=3, row=0, sticky="nsew")
       
-      self.__SavedItemQuantity[recordName] = item.quantity
-      item.pack(fill="x")
+      itemRow.pack(fill="x")
 
     
     returnBtn = ttk.Button(contentFrame, text="Return to Menu", command=lambda: self.transitionFrame(self.initCashierMode))
@@ -358,17 +374,8 @@ class App(tk.Tk) :
     popUp.destroy()
     self.transitionFrame(self.initDeleteMIPage)
 
-  def transitionFrame(self, initNewPage) :
-    self.mainFrame.destroy()
-    self.clearReceiptInstances()
-    self.initializeMainFrame()
-    initNewPage()
-
-  def editMenuItem(self) :
+  def deleteMenuItem(self, itemRow, name) :
     pass
-
-  def deleteMenuItem(self) :
-    pass 
 
   #Receipt
   def initializeReceipt(self) :
