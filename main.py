@@ -625,13 +625,8 @@ class App(tk.Tk) :
         return False
 
   def addMenuItem(self, data) :
-    #
-    #
-    #Implement PopUp for if not data:
-    #
-    #
     if not data:
-      print("Fields cannot be empty.")
+      self.emptyFieldsPopUp()
       return
     
     print(f"Here is data in adding: {data}")
@@ -646,6 +641,13 @@ class App(tk.Tk) :
     self.__MenuItemRecords[MenuItemRecord['name']] = MenuItemRecord
 
     self.commitDBChanges("d: prototype data saved to menu_items table in DB")
+
+  def emptyFieldsPopUp(self) :
+    popUp = self.createPopUp(self.mainFrame)
+    contentFrame = tk.Frame(popUp, padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+    ttk.Label(contentFrame, text="Fields cannot be empty.").pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
 
   def removeMenuItem(self) :
     #need to ask for confirmation from user then delete from DB
