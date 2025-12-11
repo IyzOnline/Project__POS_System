@@ -9,6 +9,7 @@ import json
 import threading
 import os
 from dotenv import load_dotenv
+import socket
 
 class App(tk.Tk) :
   def __init__(self):
@@ -20,7 +21,7 @@ class App(tk.Tk) :
     self.initializeExitFS()
     self.initDB()
 
-    self.client_connection = None
+    self.clientConnection = None
     self.__receivedOrderInfo = None
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
@@ -48,23 +49,32 @@ class App(tk.Tk) :
     serverThread = threading.Thread(target=self.runCashierServer)
     serverThread.daemon = True
     serverThread.start()
+    self.checkServerConnection()
 
   def runCashierServer(self) :
-    SERVER_IP = '0.0.0.0'
+    SERVER_IP = '10.0.0.1'
     PORT = 65432
     try :
       with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serverSocket:
         serverSocket.bind((SERVER_IP, PORT))
         serverSocket.listen()
+        print(f"listening")
+        print(socket.gethostbyname(socket.gethostname()))
 
         conn, addr = serverSocket.accept()
 
-        self.client_connection = conn
-        self.connectToKitchenBtn.config(state=tk.NORMAL)
-        self.connectionLbl.config(text="Status: Connected to Kitchen.", fg="green")
+        self.clientConnection = conn
+        self.serverConnected = True
         print("Connected to Kitchen!")
     except Exception as e :
       print(f"Server Error: {e}")
+
+  def checkServerConnection(self):
+    if hasattr(self, 'serverConnected') and self.serverConnected:
+        self.connectToKitchenBtn.config(state=tk.NORMAL)
+        self.connectionLbl.config(text="Status: Connected to Kitchen.", fg="green")
+    else:
+        self.after(100, self.checkServerConnection)
 
   def startClientThread(self) :
     serverThread = threading.Thread(target=self.runKitchenClient)
@@ -73,7 +83,7 @@ class App(tk.Tk) :
 
   def runKitchenClient(self) :
     load_dotenv()
-    targetIP = os.getenv("IP_ADDRESS")
+    targetIP = "10.0.0.1"
     targetPORT = 65432
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
@@ -622,7 +632,7 @@ class App(tk.Tk) :
     self.initTotal(checkoutFrame)
 
     returnBtn = ttk.Button(checkoutFrame, text="Return to Order", command=lambda: self.transitionFrame(self.initCashierMode))
-    saveBtn = ttk.Button(checkoutFrame, text="Place Order", command=lambda: self.order.saveOrderToDB(self.client_connection))
+    saveBtn = ttk.Button(checkoutFrame, text="Place Order", command=lambda: self.order.saveOrderToDB(self.clientConnection))
 
     returnBtn.pack()
     saveBtn.pack()
@@ -949,7 +959,7 @@ class Order() :
     else:
       self.orderNum = 1
 
-  def saveOrderToDB(self, client_connection) :
+  def saveOrderToDB(self, clientConnection) :
     if not self.__ItemsInOrder:
       print("Order is empty!")
       return 
@@ -970,10 +980,10 @@ class Order() :
     self.commitDBChanges("Saved items in receipt to order_items table in DB.")
     print(f"Data to be transferred: {data}")
 
-    if client_connection :
+    if clientConnection :
       try :
         orderInfoToBytes = json.dumps(data).encode('utf-8')
-        client_connection.sendall(orderInfoToBytes)
+        clientConnection.sendall(orderInfoToBytes)
       except Exception as e :
         print(f"Error sending data: {e}")
         
