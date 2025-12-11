@@ -39,12 +39,10 @@ class App(tk.Tk) :
     self.connectToKitchenBtn.config(state=tk.DISABLED)
     self.connectionLbl.config(text="Status: Connecting to Kitchen...")
     self.startServerThread()
-    print("Connected to Kitchen!")
 
   def connectToCashier(self) :
     self.connectToCashierBtn.config(state=tk.DISABLED)
     self.startClientThread()
-    print("Connected to Cashier!")
 
   def startServerThread(self) :
     serverThread = threading.Thread(target=self.runCashierServer)
@@ -54,16 +52,19 @@ class App(tk.Tk) :
   def runCashierServer(self) :
     SERVER_IP = '0.0.0.0'
     PORT = 65432
+    try :
+      with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serverSocket:
+        serverSocket.bind((SERVER_IP, PORT))
+        serverSocket.listen()
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serverSocket:
-      serverSocket.bind((SERVER_IP, PORT))
-      serverSocket.listen()
+        conn, addr = serverSocket.accept()
 
-      conn, addr = serverSocket.accept()
-
-      self.client_connection = conn
-      self.connectToKitchenBtn.config(state=tk.NORMAL)
-      self.connectionLbl.config(text="Status: Connected to Kitchen.", background="green")
+        self.client_connection = conn
+        self.connectToKitchenBtn.config(state=tk.NORMAL)
+        self.connectionLbl.config(text="Status: Connected to Kitchen.", background="green")
+        print("Connected to Kitchen!")
+    except Exception as e :
+      print(f"Server Error: {e}")
 
   def startClientThread(self) :
     serverThread = threading.Thread(target=self.runKitchenClient)
@@ -78,9 +79,11 @@ class App(tk.Tk) :
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
       try :
         clientSocket.connect((targetIP, targetPORT))
-        packet = clientSocket.recv(4096)
+        print("Connected to Cashier!")
 
         while True :
+          packet = clientSocket.recv(4096)
+
           if not packet :
             print("Server disconnected.")
             break
@@ -90,6 +93,7 @@ class App(tk.Tk) :
           print(f"RECEIVED ORDER: {self.receivedOrderInfo}")
       except ConnectionRefusedError :
         print("Could not connect. Is the server listening?")
+        self.connectToCashierBtn.config(state=tk.NORMAL)
       except Exception as e :
         print(f"An error occurred: {e}")
     
@@ -516,7 +520,6 @@ class App(tk.Tk) :
           savedQuantityLbl.config(text=value[3])
           savedSumLbl.config(text=value[1]*value[3])
       else :
-        print("Printing Deluxe")
         print(f"Here is the SavedItemQuantity of {value[0]}: {self.__SavedItemQuantity[value[0]].get()}")
         orderItemFrame = ttk.Frame(self.orderListFrame)
         self.__ReceiptListInstances[key] = value + (orderItemFrame,)
@@ -938,12 +941,12 @@ class Order() :
     self.commitDBChanges("Saved items in receipt to order_items table in DB.")
     print(f"Data to be transferred: {data}")
 
-    #if client_connection :
-    #  try :
-    #    orderInfoToBytes = json.dumps(data).encode('utf-8')
-    #    client_connection.sendall(orderInfoToBytes)
-    #  except Exception as e :
-    #    print(f"Error sending data: {e}")
+    if client_connection :
+      try :
+        orderInfoToBytes = json.dumps(data).encode('utf-8')
+        client_connection.sendall(orderInfoToBytes)
+      except Exception as e :
+        print(f"Error sending data: {e}")
         
     self.clearAllInstances()
     print("Order saved! New order ready.")
