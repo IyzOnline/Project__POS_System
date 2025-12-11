@@ -83,7 +83,7 @@ class App(tk.Tk) :
 
   def runKitchenClient(self) :
     load_dotenv()
-    targetIP = "10.0.0.1"
+    targetIP = os.getenv("IP_ADDRESS")
     targetPORT = 65432
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
@@ -617,7 +617,7 @@ class App(tk.Tk) :
 
       quantityLbl = ttk.Label(orderItemFrame, text=value[3], anchor="center", name="quantityLbl")
       nameLbl = ttk.Label(orderItemFrame, text=value[0], anchor="center", name="nameLbl")
-      sumLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], anchor="center", name="sumLbl")
+      productLbl = ttk.Label(orderItemFrame, text=value[1]*value[3], anchor="center", name="sumLbl")
 
       orderItemFrame.grid_columnconfigure(0, weight=1)
       orderItemFrame.grid_columnconfigure(1, weight=1)
@@ -625,7 +625,7 @@ class App(tk.Tk) :
 
       quantityLbl.grid(column=0, row=0, sticky="nsew")
       nameLbl.grid(column=1, row=0, sticky="nsew")
-      sumLbl.grid(column=2, row=0, sticky="nsew")
+      productLbl.grid(column=2, row=0, sticky="nsew")
 
       orderItemFrame.pack(fill="x")
     
