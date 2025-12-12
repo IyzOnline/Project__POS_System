@@ -24,6 +24,7 @@ class App(tk.Tk) :
     self.clientConnection = None
     self.serverConnected = None
     self.__receivedOrderInfo = None
+    self.__connectionAttempted = False
     
     #Menu
     self.__MenuItemRecords = {}
@@ -47,12 +48,14 @@ class App(tk.Tk) :
 #Networking
   def connectToKitchen(self) :
     self.disableButtonsforCashierMode()
+    self.__connectionAttempted = True
     self.cashierConnectionLbl.config(text="Status: Connecting to Kitchen...", fg="orange")
     self.startServerThread()
 
   def connectToCashier(self) :
     self.disableButtonsForKitchenMode()
-    self.cashierConnectionLbl.config(text="Status: Connecting to Cashier...", fg="orange")
+    self.__connectionAttempted = True
+    self.kitchenConnectionLbl.config(text="Status: Connecting to Cashier...", fg="orange")
     self.startClientThread()
 
   def disableButtonsforCashierMode(self) :
@@ -357,7 +360,7 @@ class App(tk.Tk) :
     self.connectToKitchenBtn = ttk.Button(self.menuLowerBtns, text="Connect to Kitchen PC", command = lambda: self.connectToKitchen())
     self.cashierConnectionLbl = tk.Label(self.menuLowerBtns, text="Status: Not Connected to Kitchen...", fg="red")
 
-    if self.serverConnected :
+    if self.__connectionAttempted :
       self.connectToKitchenBtn.config(state=tk.DISABLED)
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
