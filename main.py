@@ -20,20 +20,39 @@ class App(tk.Tk) :
     self.initializeExitFS()
     self.initDB()
 
+    #Network
     self.clientConnection = None
+    self.serverConnected = None
     self.__receivedOrderInfo = None
+    
+    #Menu
     self.__MenuItemRecords = {}
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
-    self.__OrderRecords = {}
+    
+    #Kitchen
     self.__kitchenOrderInstances = {}
+
+    #History
+    self.__OrderRecords = {}
+
+    #Global Frames
+    self.cashierPageMainFrame = None
+    self.kitchenPageMainFrame = None
+    self.historyPageMainFrame = None
+    self.createMIMainFrame = None
+    self.deleteMIMainFrame = None
+    self.checkoutMainFrame = None
+    self.receiptFrameContent = None
+
     self.total = tk.DoubleVar(value=0)
     self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
+    self.currentFrame = None
 
     self.initializeSidebar()
     self.initializeMainFrame()
-    self.initCashierMode()
+    self.initializeCashierPage()
 
 #Networking
   def connectToKitchen(self) :
@@ -150,21 +169,39 @@ class App(tk.Tk) :
   def exit_fullscreen(self, event=None) :
     self.attributes('-fullscreen', False)
 
-  def transitionFrame(self, initNewPage) :
-    self.mainFrame.destroy()
+  def transitionFrame(self, initializeNewFrame) :
+    self.currentFrame.pack_forget()
     self.clearReceiptInstances()
-    self.initializeMainFrame()
-    initNewPage()
+    initializeNewFrame()
 
   #Main Frame
   def initializeMainFrame(self) :
     self.mainFrame = tk.Frame(self, bg="#ffffff")
     self.mainFrame.pack(side=tk.LEFT, expand=True, fill="both")
 
-  #Cashier Mode
-  def initCashierMode(self):
-    self.menuFrame = tk.Frame(self.mainFrame, bg="#49a3df")
-    self.receiptFrame = tk.Frame(self.mainFrame, bg="#5faee3")
+  #Cashier/Menu Page - Page
+  def initializeCashierPage(self):
+    if self.cashierPageMainFrame :
+      #Clear items in menu table and receipt
+      for i, row in enumerate(self.menuTable.winfo_children()) :
+        if i == 0 :
+          continue
+        row.destroy()
+      self.receiptFrameContent.destroy()
+
+      #Initialize menu items and receipt again
+      self.initializeMenuItems(None)
+      self.initializeReceipt()
+      self.cashierPageMainFrame.pack(expand=True, fill="both")
+      self.currentFrame = self.cashierPageMainFrame
+      return
+        
+    self.cashierPageMainFrame = tk.Frame(self.mainFrame)
+    self.cashierPageMainFrame.pack(expand=True, fill="both")
+    self.currentFrame = self.cashierPageMainFrame
+
+    self.menuFrame = tk.Frame(self.cashierPageMainFrame, bg="#49a3df")
+    self.receiptFrame = tk.Frame(self.cashierPageMainFrame, bg="#5faee3")
 
     self.menuFrame.place(relx=0.0, rely=0, relwidth=0.82, relheight=1.0)
     self.receiptFrame.place(relx=0.82, rely=0, relwidth=0.18, relheight=1.0)
@@ -172,163 +209,6 @@ class App(tk.Tk) :
     self.initializeMenuArea()
     self.initializeReceipt()
   
-  #Kitchen Mode
-  def initKitchenMode(self) :
-    kitchenModeFrame = tk.Frame(self.mainFrame, background="#333333")
-    kitchenModeFrame.pack(expand=True, fill="both", padx=2, pady=2)
-    
-    kitchenModeLbl = ttk.Label(kitchenModeFrame, text="KITCHEN MODE")
-    kitchenModeLbl.pack(pady=20)
-
-    self.kitchenOrdersFrame = tk.Frame(kitchenModeFrame, background="#4d4d4d", highlightbackground="white", highlightthickness=2)
-    self.kitchenOrdersFrame.pack(expand=True, fill="both", padx=10, pady=10)
-
-    self.connectToCashierBtn = ttk.Button(kitchenModeFrame, text="Connect to Cashier PC", command=self.connectToCashier())
-    self.connectToCashierBtn.pack(pady=20, anchor="center")
-
-    if not self.kitchenOrdersFrame.winfo_children():
-      self.tempKitchenOrderLbl = ttk.Label(self.kitchenOrdersFrame, text="Waiting for orders...")
-      self.tempKitchenOrderLbl.pack()
-      #self.kitchenOrdersFrame.grid_columnconfigure(0, weight=1)
-      #tempKitchenOrderLbl.grid(column=0, row=0, pady=10)
-
-  def createKitchenOrderInstance(self) :
-    self.kitchenOrderInstanceWidth = 200
-    for orderNum, itemsInOrder in self.__receivedOrderInfo.items():
-      print(f"Order Number {orderNum}: ")
-      instance = tk.Frame(self.kitchenOrdersFrame, width=self.kitchenOrderInstanceWidth, height=300, background="white")
-      instance.pack_propagate(False)
-      
-      contentFrame = tk.Frame(instance)
-      contentFrame.pack(expand=True, fill="both", padx=10, pady=10)
-      tk.Label(contentFrame, text=f"Order Number {orderNum}").pack(fill="x", pady=10)
-
-      for itemName, quantity in itemsInOrder.items():
-        print(itemName, quantity)
-        itemFrame = tk.Frame(contentFrame)
-
-        tk.Label(itemFrame, text=itemName).pack(side="left", padx=10)
-        tk.Label(itemFrame, text=quantity).pack(side="right", padx=10)
-
-        itemFrame.pack(fill="x", pady=5)
-
-      buttonsFrame = tk.Frame(instance)
-      tk.Button(buttonsFrame, text="DONE", command=lambda: self.tempRemoveInstance(orderNum, instance)).pack(side="left", padx=10)
-      tk.Button(buttonsFrame, text="CANCEL", command=lambda: self.tempRemoveInstance(orderNum, instance)).pack(side="left", padx=10)
-      buttonsFrame.pack()
-      print("======")
-      self.__receivedOrderInfo = None
-      self.__kitchenOrderInstances[orderNum] = instance
-
-  def tempRemoveInstance(self, key, currentInstance) :
-    print(key)
-    currentInstance.destroy()
-    del self.__kitchenOrderInstances[key]
-    self.rearrangeKitchenOrderInstances()
-    print("deleted!")
-
-  def rearrangeKitchenOrderInstances(self, event=None) :
-    w = self.kitchenOrdersFrame.winfo_width()
-    #print("width:" + str(w))
-
-    columns = max(1, w // (self.kitchenOrderInstanceWidth + 30))
-    #print("column amount: " + str(columns))
-
-    for i, (orderNum, instance) in enumerate(self.__kitchenOrderInstances.items()) :
-      row_no = i // columns
-      col_no = i % columns
-
-      instance.grid(column=col_no, row=row_no, padx=15, pady=50)
-
-  #History Page
-  def initHistoryPage(self) :
-    historyPageFrame = tk.Frame(self.mainFrame, padx=10, pady=10, background="#ffffff")
-    historyPageFrame.pack()
-
-    historyTableLbl = ttk.Label(historyPageFrame, text="Order History")
-    historyTableLbl.pack()
-
-    self.displayHistoryTableColumns(historyPageFrame)
-    self.displayHistoryTable(historyPageFrame)
-
-  def displayHistoryTableColumns(self, parent):
-    columns = tk.Frame(parent)
-
-    orderIDCol = ttk.Label(columns, text="Order ID", style="Cell.TLabel", anchor="center")
-    dateCol = ttk.Label(columns, text="Date and Time", style="Cell.TLabel", anchor="center")
-    nameCol = ttk.Label(columns, text="Name", style="Cell.TLabel", anchor="center")
-    categoryCol = ttk.Label(columns, text="Category", style="Cell.TLabel", anchor="center")
-    priceCol = ttk.Label(columns, text="Price", style="Cell.TLabel", anchor="center")
-    quantityCol = ttk.Label(columns, text="Quantity", style="Cell.TLabel", anchor="center")
-    totalCol = ttk.Label(columns, text="Total", style="Cell.TLabel", anchor="center")
-
-    columns.grid_columnconfigure(0, weight=1)
-    columns.grid_columnconfigure(1, weight=1)
-    columns.grid_columnconfigure(2, weight=1)
-    columns.grid_columnconfigure(3, weight=1)
-    columns.grid_columnconfigure(4, weight=1)
-    columns.grid_columnconfigure(5, weight=1)
-    columns.grid_columnconfigure(6, weight=1)
-
-
-    orderIDCol.grid(column=0, row=0, sticky="nsew")
-    dateCol.grid(column=1, row=0, sticky="nsew")
-    nameCol.grid(column=2, row=0, sticky="nsew")
-    categoryCol.grid(column=3, row=0, sticky="nsew")
-    priceCol.grid(column=4, row=0, sticky="nsew")
-    quantityCol.grid(column=5, row=0, sticky="nsew")
-    totalCol.grid(column=6, row=0, sticky="nsew")
-    
-    columns.pack(fill="x")
-
-  def displayHistoryTable(self, parent):
-    self.reqForOrderHistory()
-    if not self.__OrderRecords:
-      print("No orders recorded")
-      return
-
-    for key, orderData in self.__OrderRecords.items():
-      for orderItemKey, orderItemData in orderData["items"].items():
-        orderItemRow = tk.Frame(parent)
-
-        orderIDCol = ttk.Label(orderItemRow, text=orderData["orderID"], style="Cell.TLabel", anchor="center")
-        dateCol = ttk.Label(orderItemRow, text=orderData["date"].strftime("%Y-%m-%d - %H:%M:%S %p"), style="Cell.TLabel", anchor="center")
-        nameCol = ttk.Label(orderItemRow, text=orderItemData["name"], style="Cell.TLabel", anchor="center")
-        categoryCol = ttk.Label(orderItemRow, text=orderItemData["category"], style="Cell.TLabel", anchor="center")
-        priceCol = ttk.Label(orderItemRow, text=f"₱{orderItemData['price']:.2f}", style="Cell.TLabel", anchor="center")
-        quantityCol = ttk.Label(orderItemRow, text=orderItemData["quantity"], style="Cell.TLabel", anchor="center")
-
-        total = orderItemData['quantity'] * orderItemData['price']
-
-        totalCol = ttk.Label(orderItemRow, text=f"₱{total:.2f}", style="Cell.TLabel", anchor="center")
-
-        for i in range(7):
-           orderItemRow.grid_columnconfigure(i, weight=1)
-
-        orderIDCol.grid(column=0, row=0, sticky="nsew")
-        dateCol.grid(column=1, row=0, sticky="nsew")
-        nameCol.grid(column=2, row=0, sticky="nsew")
-        categoryCol.grid(column=3, row=0, sticky="nsew")
-        priceCol.grid(column=4, row=0, sticky="nsew")
-        quantityCol.grid(column=5, row=0, sticky="nsew")
-        totalCol.grid(column=6, row=0, sticky="nsew")
-        
-        orderItemRow.pack(fill="x")
-
-  #Sidebar
-  def initializeSidebar(self) :
-    self.sidebarFrame = tk.Frame(self, bg="#3498db")
-    self.sidebarFrame.pack(side=tk.LEFT, fill="y")
-
-    self.cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Mode", command=lambda: self.transitionFrame(self.initCashierMode))
-    self.kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Mode", command=lambda: self.transitionFrame(self.initKitchenMode))
-    self.historyPageBtn = ttk.Button(self.sidebarFrame, text="History Page", command=lambda: self.transitionFrame(self.initHistoryPage))
-
-    self.cashierPageBtn.pack(padx=5, pady=5)
-    self.kitchenPageBtn.pack(padx=5, pady=5)
-    self.historyPageBtn.pack(padx=5, pady=5)
-
-  #Menu
   def initializeMenuArea(self) :
     self.menuSearch = tk.Frame(self.menuFrame, bg="#333333", padx=10, pady=10)
     self.menuTable = tk.Frame(self.menuFrame, bg="#4d4d4d", padx=20, pady=20)
@@ -360,8 +240,11 @@ class App(tk.Tk) :
 
   def searchThroughRecords(self, searchString) :
     print(f"Current search string: {searchString}")
-    for row in self.menuTable.winfo_children() :
+    for i, row in enumerate(self.menuTable.winfo_children()) :
+      if i == 0 :
+        continue
       row.destroy()
+    
     self.initializeMenuItems(searchString)
     print("Search complete.")
 
@@ -386,15 +269,11 @@ class App(tk.Tk) :
     columns.pack(fill="x")
 
   def initializeMenuItems(self, searchString) :
-    self.empty = None
     if (len(self.__MenuItemRecords) == 0):
       if not self.initMenuItemsfromDB():
         self.empty = tk.Label(self.menuTable, text="No records exist.")
         self.empty.pack(expand=True, fill="both")
-    #else :
-    #  if (self.empty) :
-    #   self.empty.destroy()
-    
+
     for recordName, recordValues in self.__MenuItemRecords.items():
       if searchString and searchString.strip().lower() not in recordValues["name"].lower() :
         continue
@@ -413,8 +292,14 @@ class App(tk.Tk) :
 
       self.__SavedItemQuantity[recordName] = item.quantity
       item.pack(fill="x")
-      
+    
+  #Create Menu Item Page - Page
   def initCreateMIPage(self) :
+    if self.createMIMainFrame :
+      self.createMIMainFrame.pack(expand=True, fill="both", anchor=tk.CENTER)
+      self.currentFrame = self.createMIMainFrame
+      return
+    
     def passData():
       if not (nameEntry.get() and priceEntry.get() and categoryEntry.get()) :
         return None
@@ -437,10 +322,11 @@ class App(tk.Tk) :
       print(data)
       return data
 
-    createMIFrame = tk.Frame(self.mainFrame, background="#333333")
-    createMIFrame.pack(expand=True, fill="both", anchor=tk.CENTER)
+    self.createMIMainFrame = tk.Frame(self.mainFrame, background="#333333")
+    self.createMIMainFrame.pack(expand=True, fill="both", anchor=tk.CENTER)
+    self.currentFrame = self.createMIMainFrame
 
-    contentFrame = tk.Frame(createMIFrame, background="#4d4d4d", padx=10, pady=10)
+    contentFrame = tk.Frame(self.createMIMainFrame, background="#4d4d4d", padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
 
     nameEntry = ttk.Entry(contentFrame, width=30, font=("Helvetica", 14))
@@ -448,7 +334,7 @@ class App(tk.Tk) :
     categoryEntry = ttk.Entry(contentFrame, width=30, font=("Helvetica", 14))
 
     saveBtn = ttk.Button(contentFrame, text="Save to DB", command=lambda: self.addMenuItem(passData()))
-    returnBtn = ttk.Button(contentFrame, text="Return to Menu", command=lambda: self.transitionFrame(self.initCashierMode))
+    returnBtn = ttk.Button(contentFrame, text="Return to Menu", command=lambda: self.transitionFrame(self.initializeCashierPage))
 
     ttk.Label(contentFrame, text="- Name -").pack(anchor="center", pady=5)
     nameEntry.pack(anchor="center", pady=5)
@@ -460,11 +346,18 @@ class App(tk.Tk) :
     saveBtn.pack(anchor="center", pady=5)
     returnBtn.pack(anchor="center", pady=5)
 
+  #Delete Menu Item Page - Page
   def initDeleteMIPage(self) :
-    deleteMIFrame = tk.Frame(self.mainFrame, background="#333333")
-    deleteMIFrame.pack(expand=True, fill="both", anchor=tk.CENTER)
+    if self.deleteMIMainFrame :
+      self.deleteMIMainFrame.pack(expand=True, fill="both", anchor=tk.CENTER)
+      self.currentFrame = self.deleteMIMainFrame
+      return
+    
+    self.deleteMIMainFrame = tk.Frame(self.mainFrame, background="#333333")
+    self.deleteMIMainFrame.pack(expand=True, fill="both", anchor=tk.CENTER)
+    self.currentFrame = self.deleteMIMainFrame
 
-    contentFrame = tk.Frame(deleteMIFrame, background="#4d4d4d", padx=10, pady=10)
+    contentFrame = tk.Frame(self.deleteMIMainFrame, background="#4d4d4d", padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
 
     deleteTableLbl = ttk.Label(contentFrame, text="Deletion Table")
@@ -492,7 +385,7 @@ class App(tk.Tk) :
       
       itemRow.pack(fill="x")
 
-    returnBtn = ttk.Button(contentFrame, text="Return to Menu", command=lambda: self.transitionFrame(self.initCashierMode))
+    returnBtn = ttk.Button(contentFrame, text="Return to Menu", command=lambda: self.transitionFrame(self.initializeCashierPage))
     returnBtn.pack(anchor="center", pady=5)
 
   def initDeleteMIColumns(self, parent):
@@ -554,16 +447,19 @@ class App(tk.Tk) :
 
   #Receipt
   def initializeReceipt(self) :
-    orderNumLbl = ttk.Label(self.receiptFrame, text=f"Order {self.order.orderNum}", style="Cell.TLabel", anchor="center")
-    self.orderListFrame = ttk.Frame(self.receiptFrame, style="OrderList.TFrame")
+    self.receiptFrameContent = tk.Frame(self.receiptFrame)
+    self.receiptFrameContent.pack(expand=True, fill="both")
+
+    orderNumLbl = ttk.Label(self.receiptFrameContent, text=f"Order {self.order.orderNum}", style="Cell.TLabel", anchor="center")
+    self.orderListFrame = ttk.Frame(self.receiptFrameContent, style="OrderList.TFrame")
     
-    orderNumLbl.pack()
+    orderNumLbl.pack(fill="x")
     self.orderListFrame.pack(expand=True, fill="both")
 
     self.updateReceiptArea()
-    self.initTotal(self.receiptFrame)
+    self.initTotal(self.receiptFrameContent)
 
-    checkoutBtn = ttk.Button(self.receiptFrame, text="Checkout", command=self.initCheckoutPage)
+    checkoutBtn = ttk.Button(self.receiptFrameContent, text="Checkout", command=self.checkBeforeCheckout)
     checkoutBtn.pack()
   
   def updateReceiptArea(self) :
@@ -637,20 +533,18 @@ class App(tk.Tk) :
 
     totalFrame.pack(fill="x", pady=10)
 
-  #Checkout Page
+  #Checkout Page - Page
   def initCheckoutPage(self) :
-    if not self.__MenuItemInstances:
-      self.cantCheckoutPopUp()
+    if self.checkoutMainFrame :
+      self.checkoutMainFrame.pack(expand=True, fill="both", anchor="center", padx=10, pady=10)
+      self.currentFrame = self.checkoutMainFrame
       return
     
-    self.mainFrame.destroy()
-    self.clearReceiptInstances()
-    self.initializeMainFrame()
+    self.checkoutMainFrame = tk.Frame(self.mainFrame, background="#333333")
+    self.checkoutMainFrame.pack(expand=True, fill="both", anchor="center", padx=10, pady=10)
+    self.currentFrame = self.checkoutMainFrame
 
-    checkoutFrame = tk.Frame(self.mainFrame,  background="#333333")
-    checkoutFrame.pack(expand=True, fill="both", anchor="center", padx=10, pady=10)
-
-    contentFrame = tk.Frame(checkoutFrame, padx=10, pady=10, width=500, height=700)
+    contentFrame = tk.Frame(self.checkoutMainFrame, padx=10, pady=10, width=500, height=700)
     contentFrame.pack(expand=True, anchor="center")
 
     orderLbl = tk.Label(contentFrame, text=f"Order {self.order.orderNum}")
@@ -678,11 +572,24 @@ class App(tk.Tk) :
     tk.Label(contentFrame, text="=======================================================").pack(fill="x", anchor="center")
     self.initTotal(contentFrame)
 
-    returnBtn = ttk.Button(contentFrame, text="Return to Order", command=lambda: self.transitionFrame(self.initCashierMode))
+    returnBtn = ttk.Button(contentFrame, text="Return to Order", command=lambda: self.transitionFrame(self.initializeCashierPage))
     saveBtn = ttk.Button(contentFrame, text="Place Order", command=self.successfulOrderSavePopUp)
 
     saveBtn.pack(pady=10)
     returnBtn.pack(pady=10)
+
+  def checkBeforeCheckout(self):
+    if not self.__MenuItemInstances:
+      self.cantCheckoutPopUp()
+      return
+    self.transitionFrame(self.initCheckoutPage)
+
+  def cantCheckoutPopUp(self) :
+    popUp = self.createPopUp(self)
+    contentFrame = tk.Frame(popUp, padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+    ttk.Label(contentFrame, text="You must order something first.").pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
 
   def successfulOrderSavePopUp(self) :
     self.order.saveOrderToDB(self.clientConnection)
@@ -692,12 +599,173 @@ class App(tk.Tk) :
     ttk.Label(contentFrame, text="Order Saved Successfully").pack(pady=10, anchor="center")
     ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
 
-  def cantCheckoutPopUp(self) :
-    popUp = self.createPopUp(self)
-    contentFrame = tk.Frame(popUp, padx=10, pady=10)
-    contentFrame.pack(expand=True, anchor="center")
-    ttk.Label(contentFrame, text="You must order something first.").pack(pady=10, anchor="center")
-    ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
+  #Kitchen Page - Page
+  def initializeKitchenPage(self) :
+    if self.kitchenPageMainFrame :
+      self.kitchenPageMainFrame.pack(expand=True, fill="both", padx=2, pady=2)
+      self.currentFrame = self.kitchenPageMainFrame
+      return
+    
+    self.kitchenPageMainFrame = tk.Frame(self.mainFrame, background="#333333")
+    self.kitchenPageMainFrame.pack(expand=True, fill="both", padx=2, pady=2)
+    self.currentFrame = self.kitchenPageMainFrame
+    
+    kitchenModeLbl = ttk.Label(self.kitchenPageMainFrame, text="KITCHEN MODE")
+    kitchenModeLbl.pack(pady=20)
+
+    self.kitchenOrdersFrame = tk.Frame(self.kitchenPageMainFrame, background="#4d4d4d", highlightbackground="white", highlightthickness=2)
+    self.kitchenOrdersFrame.pack(expand=True, fill="both", padx=10, pady=10)
+
+    self.connectToCashierBtn = ttk.Button(self.kitchenPageMainFrame, text="Connect to Cashier PC", command=self.connectToCashier())
+    self.connectToCashierBtn.pack(pady=20, anchor="center")
+
+    if not self.kitchenOrdersFrame.winfo_children():
+      self.tempKitchenOrderLbl = ttk.Label(self.kitchenOrdersFrame, text="Waiting for orders...")
+      self.tempKitchenOrderLbl.pack()
+      #self.kitchenOrdersFrame.grid_columnconfigure(0, weight=1)
+      #tempKitchenOrderLbl.grid(column=0, row=0, pady=10)
+
+  def createKitchenOrderInstance(self) :
+    self.kitchenOrderInstanceWidth = 200
+    for orderNum, itemsInOrder in self.__receivedOrderInfo.items():
+      print(f"Order Number {orderNum}: ")
+      instance = tk.Frame(self.kitchenOrdersFrame, width=self.kitchenOrderInstanceWidth, height=300, background="white")
+      instance.pack_propagate(False)
+      
+      contentFrame = tk.Frame(instance)
+      contentFrame.pack(expand=True, fill="both", padx=10, pady=10)
+      tk.Label(contentFrame, text=f"Order Number {orderNum}").pack(fill="x", pady=10)
+
+      for itemName, quantity in itemsInOrder.items():
+        print(itemName, quantity)
+        itemFrame = tk.Frame(contentFrame)
+
+        tk.Label(itemFrame, text=itemName).pack(side="left", padx=10)
+        tk.Label(itemFrame, text=quantity).pack(side="right", padx=10)
+
+        itemFrame.pack(fill="x", pady=5)
+
+      buttonsFrame = tk.Frame(instance)
+      tk.Button(buttonsFrame, text="DONE", command=lambda: self.tempRemoveInstance(orderNum, instance)).pack(side="left", padx=10)
+      tk.Button(buttonsFrame, text="CANCEL", command=lambda: self.tempRemoveInstance(orderNum, instance)).pack(side="left", padx=10)
+      buttonsFrame.pack()
+      print("======")
+      self.__receivedOrderInfo = None
+      self.__kitchenOrderInstances[orderNum] = instance
+
+  def tempRemoveInstance(self, key, currentInstance) :
+    print(key)
+    currentInstance.destroy()
+    del self.__kitchenOrderInstances[key]
+    self.rearrangeKitchenOrderInstances()
+    print("deleted!")
+
+  def rearrangeKitchenOrderInstances(self, event=None) :
+    w = self.kitchenOrdersFrame.winfo_width()
+    #print("width:" + str(w))
+
+    columns = max(1, w // (self.kitchenOrderInstanceWidth + 30))
+    #print("column amount: " + str(columns))
+
+    for i, (orderNum, instance) in enumerate(self.__kitchenOrderInstances.items()) :
+      row_no = i // columns
+      col_no = i % columns
+
+      instance.grid(column=col_no, row=row_no, padx=15, pady=50)
+
+  #History Page - Page
+  def initializeHistoryPage(self) :
+    if self.historyPageMainFrame :
+      self.historyPageMainFrame.pack()
+      self.currentFrame = self.historyPageMainFrame
+      return
+    
+    self.historyPageMainFrame = tk.Frame(self.mainFrame, padx=10, pady=10, background="#ffffff")
+    self.historyPageMainFrame.pack()
+    self.currentFrame = self.historyPageMainFrame
+
+    historyTableLbl = ttk.Label(self.historyPageMainFrame, text="Order History")
+    historyTableLbl.pack()
+
+    self.displayHistoryTableColumns(self.historyPageMainFrame)
+    self.displayHistoryTable(self.historyPageMainFrame)
+
+  def displayHistoryTableColumns(self, parent):
+    columns = tk.Frame(parent)
+
+    orderIDCol = ttk.Label(columns, text="Order ID", style="Cell.TLabel", anchor="center")
+    dateCol = ttk.Label(columns, text="Date and Time", style="Cell.TLabel", anchor="center")
+    nameCol = ttk.Label(columns, text="Name", style="Cell.TLabel", anchor="center")
+    categoryCol = ttk.Label(columns, text="Category", style="Cell.TLabel", anchor="center")
+    priceCol = ttk.Label(columns, text="Price", style="Cell.TLabel", anchor="center")
+    quantityCol = ttk.Label(columns, text="Quantity", style="Cell.TLabel", anchor="center")
+    totalCol = ttk.Label(columns, text="Total", style="Cell.TLabel", anchor="center")
+
+    columns.grid_columnconfigure(0, weight=1)
+    columns.grid_columnconfigure(1, weight=1)
+    columns.grid_columnconfigure(2, weight=1)
+    columns.grid_columnconfigure(3, weight=1)
+    columns.grid_columnconfigure(4, weight=1)
+    columns.grid_columnconfigure(5, weight=1)
+    columns.grid_columnconfigure(6, weight=1)
+
+
+    orderIDCol.grid(column=0, row=0, sticky="nsew")
+    dateCol.grid(column=1, row=0, sticky="nsew")
+    nameCol.grid(column=2, row=0, sticky="nsew")
+    categoryCol.grid(column=3, row=0, sticky="nsew")
+    priceCol.grid(column=4, row=0, sticky="nsew")
+    quantityCol.grid(column=5, row=0, sticky="nsew")
+    totalCol.grid(column=6, row=0, sticky="nsew")
+    
+    columns.pack(fill="x")
+
+  def displayHistoryTable(self, parent):
+    self.reqForOrderHistory()
+    if not self.__OrderRecords:
+      print("No orders recorded")
+      return
+
+    for key, orderData in self.__OrderRecords.items():
+      for orderItemKey, orderItemData in orderData["items"].items():
+        orderItemRow = tk.Frame(parent)
+
+        orderIDCol = ttk.Label(orderItemRow, text=orderData["orderID"], style="Cell.TLabel", anchor="center")
+        dateCol = ttk.Label(orderItemRow, text=orderData["date"].strftime("%Y-%m-%d - %H:%M:%S %p"), style="Cell.TLabel", anchor="center")
+        nameCol = ttk.Label(orderItemRow, text=orderItemData["name"], style="Cell.TLabel", anchor="center")
+        categoryCol = ttk.Label(orderItemRow, text=orderItemData["category"], style="Cell.TLabel", anchor="center")
+        priceCol = ttk.Label(orderItemRow, text=f"₱{orderItemData['price']:.2f}", style="Cell.TLabel", anchor="center")
+        quantityCol = ttk.Label(orderItemRow, text=orderItemData["quantity"], style="Cell.TLabel", anchor="center")
+
+        total = orderItemData['quantity'] * orderItemData['price']
+
+        totalCol = ttk.Label(orderItemRow, text=f"₱{total:.2f}", style="Cell.TLabel", anchor="center")
+
+        for i in range(7):
+           orderItemRow.grid_columnconfigure(i, weight=1)
+
+        orderIDCol.grid(column=0, row=0, sticky="nsew")
+        dateCol.grid(column=1, row=0, sticky="nsew")
+        nameCol.grid(column=2, row=0, sticky="nsew")
+        categoryCol.grid(column=3, row=0, sticky="nsew")
+        priceCol.grid(column=4, row=0, sticky="nsew")
+        quantityCol.grid(column=5, row=0, sticky="nsew")
+        totalCol.grid(column=6, row=0, sticky="nsew")
+        
+        orderItemRow.pack(fill="x")
+
+  #Sidebar
+  def initializeSidebar(self) :
+    self.sidebarFrame = tk.Frame(self, bg="#3498db")
+    self.sidebarFrame.pack(side=tk.LEFT, fill="y")
+
+    self.cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Mode", command=lambda: self.transitionFrame(self.initializeCashierPage))
+    self.kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Mode", command=lambda: self.transitionFrame(self.initializeKitchenPage))
+    self.historyPageBtn = ttk.Button(self.sidebarFrame, text="History Page", command=lambda: self.transitionFrame(self.initializeHistoryPage))
+
+    self.cashierPageBtn.pack(padx=5, pady=5)
+    self.kitchenPageBtn.pack(padx=5, pady=5)
+    self.historyPageBtn.pack(padx=5, pady=5)
 
   #Centralized Pop-Up Creation:
   def createPopUp(self, parentFrame):
@@ -859,15 +927,17 @@ class App(tk.Tk) :
           "quantity": item[5]
         }
 
+  #Reset
   def resetForNewOrder(self) :
     self.__MenuItemInstances = {}
     self.__SavedItemQuantity = {}
-    self.__ReceiptListInstances = {}
+
     self.total = tk.DoubleVar(value=0)
     self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
-    self.mainFrame.destroy()
-    self.initializeMainFrame()
-    self.initCashierMode()
+
+    self.checkoutMainFrame = None
+    self.transitionFrame(self.initializeCashierPage)
+
 
 class MenuItem(tk.Frame) :
   def __init__(self, parent, root, MenuItemRecord, MenuItemInstances, updateReceiptArea, initQuantity) :
@@ -1000,12 +1070,12 @@ class MenuItem(tk.Frame) :
       print(f"Quantity is already at max -> {currentQuantity}")
 
 class Order() :
-  def __init__(self, MenuItemInstances, conn, cursor, commitDBChanges, clearAllInstances) :
+  def __init__(self, MenuItemInstances, conn, cursor, commitDBChanges, resetForNewOrder) :
     self.__ItemsInOrder = MenuItemInstances
     self.__conn = conn
     self.__cursor = cursor
     self.commitDBChanges = commitDBChanges
-    self.clearAllInstances = clearAllInstances
+    self.resetForNewOrder = resetForNewOrder
 
     results = self.__cursor.execute("SELECT * FROM orders ORDER BY date DESC")
     latestResult = results.fetchone()
@@ -1042,7 +1112,7 @@ class Order() :
       except Exception as e :
         print(f"Error sending data to Kitchen: {e}")
       
-    self.clearAllInstances()
+    self.resetForNewOrder()
     print("Order saved! New order ready.")
 
 app = App()
