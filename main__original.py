@@ -566,16 +566,16 @@ class App(tk.Tk) :
     kitchenModeFrame = tk.Frame(self.mainFrame, background="#333333")
     kitchenModeFrame.pack(expand=True, fill="both", padx=2, pady=2)
     
-    kitchenModeLbl = ttk.Label(kitchenModeFrame, text="KITCHEN MODE")
+    kitchenModeLbl = ttk.Label(kitchenModeFrame, text="KITCHEN PAGE")
     kitchenModeLbl.pack(pady=20)
 
     self.kitchenOrdersFrame = tk.Frame(kitchenModeFrame, background="#4d4d4d", highlightbackground="white", highlightthickness=2)
     self.kitchenOrdersFrame.pack(expand=True, fill="both", padx=10, pady=10)
 
-    self.connectToCashierBtn = ttk.Button(kitchenModeFrame, text="Connect to Cashier PC", command=self.connectToCashier())
-    self.connectToCashierBtn.pack(side=tk.LEFT, padx=5, pady=5)
+    self.connectToCashierBtn = ttk.Button(kitchenModeFrame, text="Connect to Cashier PC", command=self.connectToCashier)
+    self.connectToCashierBtn.pack(side=tk.LEFT, padx=10, pady=10)
     self.kitchenConnectionLbl = tk.Label(kitchenModeFrame, text="Status: Not Connected to Cashier...", fg="red")
-    self.kitchenConnectionLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    self.kitchenConnectionLbl.pack(side=tk.LEFT, padx=10, pady=10)
 
     if self.__connectionAttempted :
       self.connectToKitchenBtn.config(state=tk.DISABLED)
