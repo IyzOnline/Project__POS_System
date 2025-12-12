@@ -37,11 +37,12 @@ def startCashierThread() :
 
 def runCashierServer() :
     global clientConnection, serverConnected
-    
+
     SERVER_IP = '0.0.0.0'
     PORT = 65432
     try :
       with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serverSocket:
+        serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         serverSocket.bind((SERVER_IP, PORT))
         serverSocket.listen()
         print(f"listening")
