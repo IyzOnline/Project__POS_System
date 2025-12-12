@@ -598,6 +598,8 @@ class App(tk.Tk) :
       self.tempKitchenOrderLbl.pack()
       #self.kitchenOrdersFrame.grid_columnconfigure(0, weight=1)
       #tempKitchenOrderLbl.grid(column=0, row=0, pady=10)
+    if self.__kitchenOrderInstances :
+      self.rearrangeKitchenOrderInstances()
 
   def createKitchenOrderInstance(self) :
     self.kitchenOrderInstanceWidth = 200
@@ -611,11 +613,11 @@ class App(tk.Tk) :
       tk.Label(contentFrame, text=f"Order Number {orderNum}").pack(fill="x", pady=10)
 
       for itemName, quantity in itemsInOrder.items():
-        print(itemName, quantity)
+        print(itemName, quantity[0])
         itemFrame = tk.Frame(contentFrame)
 
         tk.Label(itemFrame, text=itemName).pack(side="left", padx=10)
-        tk.Label(itemFrame, text=quantity).pack(side="right", padx=10)
+        tk.Label(itemFrame, text=quantity[0]).pack(side="right", padx=10)
 
         itemFrame.pack(fill="x", pady=5)
 
@@ -626,6 +628,7 @@ class App(tk.Tk) :
       print("======")
       self.__receivedOrderInfo = None
       self.__kitchenOrderInstances[orderNum] = instance
+    self.rearrangeKitchenOrderInstances()
 
   def tempRemoveInstance(self, key, currentInstance) :
     print(key)
