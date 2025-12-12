@@ -78,7 +78,13 @@ class App(tk.Tk) :
     serverThread = threading.Thread(target=self.runCashierServer)
     serverThread.daemon = True
     serverThread.start()
-    self.checkServerConnection()
+    self.checkServerConnectionCashierServer()
+  
+  def startClientThread(self) :
+    serverThread = threading.Thread(target=self.runKitchenClient)
+    serverThread.daemon = True
+    serverThread.start()
+    self.checkServerConnectionKitchenClient()
 
   def runCashierServer(self) :
     SERVER_IP = '0.0.0.0'
@@ -99,17 +105,17 @@ class App(tk.Tk) :
     except Exception as e :
       print(f"Server Error: {e}")
 
-  def checkServerConnection(self):
+  def checkServerConnectionCashierServer(self):
     if self.serverConnected:
-        self.kitchenConnectionLbl.config(text="Status: Connected to Cashier.", fg="green")
         self.cashierConnectionLbl.config(text="Status: Connected to Kitchen.", fg="green")
     else:
-        self.after(100, self.checkServerConnection)
+        self.after(100, self.checkServerConnectionCashierServer)
 
-  def startClientThread(self) :
-    serverThread = threading.Thread(target=self.runKitchenClient)
-    serverThread.daemon = True
-    serverThread.start()
+  def checkServerConnectionKitchenClient(self):
+    if self.serverConnected:
+        self.kitchenConnectionLbl.config(text="Status: Connected to Cashier.", fg="green")
+    else:
+        self.after(100, self.checkServerConnectionKitchenClient)
 
   def runKitchenClient(self) :
     load_dotenv()
