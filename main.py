@@ -1007,7 +1007,7 @@ class Order() :
         orderInfoToBytes = json.dumps(data).encode('utf-8')
         clientConnection.sendall(orderInfoToBytes)
       except Exception as e :
-        print(f"Error sending data: {e}")
+        print(f"Error sending data to Kitchen: {e}")
       
     self.clearAllInstances()
     print("Order saved! New order ready.")
