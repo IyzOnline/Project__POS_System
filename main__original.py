@@ -77,7 +77,7 @@ class App(tk.Tk) :
     serverThread = threading.Thread(target=self.runKitchenClient)
     serverThread.daemon = True
     serverThread.start()
-    self.checkServerConnectionCashierServer()
+    self.checkServerConnectionKitchenClient()
 
   def runCashierServer(self) :
     SERVER_IP = '0.0.0.0'
