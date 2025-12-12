@@ -8,7 +8,7 @@ from tkinter import ttk
 from pathlib import Path
 
 root = tk.Tk()
-root.geometry("1000x1000")
+root.geometry("500x500")
 receivedOrderInfo = {}
 clientConnection = None
 serverConnected = False
@@ -27,6 +27,7 @@ def initCashierMode() :
   statusLabel.config(text="Status: Cashier is Connecting to Kitchen...")
   cashierMode = tk.Frame(root, bg="black")
   cashierMode.pack()
+  startCashierThread()
 
 def startCashierThread() :
   serverThread = threading.Thread(target=runCashierServer)
@@ -73,6 +74,7 @@ def initKitchenMode() :
   statusLabel.config(text="Status: Kitchen is Connecting to Cashier...")
   kitchenMode = tk.Frame(root, bg="green")
   kitchenMode.pack()
+  startKitchenThread()
 
 def startKitchenThread() :
   serverThread = threading.Thread(target=runKitchenClient)
@@ -84,10 +86,13 @@ def runKitchenClient() :
     load_dotenv()
     targetIP = os.getenv("IP_ADDRESS")
     targetPORT = 65432
+    print("Horray!")
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
+      print("Hmmm")
       clientSocket.bind(('10.0.0.2', 0))
       try :
+        print("Start connection")
         clientSocket.connect((targetIP, targetPORT))
         print("Connected to Cashier!")
 
