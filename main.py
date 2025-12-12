@@ -9,7 +9,6 @@ import json
 import threading
 import os
 from dotenv import load_dotenv
-import socket
 
 class App(tk.Tk) :
   def __init__(self):
