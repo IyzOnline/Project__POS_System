@@ -204,11 +204,32 @@ class App(tk.Tk) :
         itemFrame.pack(fill="x", pady=5)
 
       buttonsFrame = tk.Frame(instance)
-      tk.Button(buttonsFrame, text="DONE").pack(side="left", padx=10)
-      tk.Button(buttonsFrame, text="CANCEL").pack(side="left", padx=10)
+      tk.Button(buttonsFrame, text="DONE", command=lambda: self.tempRemoveInstance(orderNum, instance)).pack(side="left", padx=10)
+      tk.Button(buttonsFrame, text="CANCEL", command=lambda: self.tempRemoveInstance(orderNum, instance)).pack(side="left", padx=10)
       buttonsFrame.pack()
       print("======")
+      self.__receivedOrderInfo = None
       self.__kitchenOrderInstances[orderNum] = instance
+
+  def tempRemoveInstance(self, key, currentInstance) :
+    print(key)
+    currentInstance.destroy()
+    del self.__kitchenOrderInstances[key]
+    self.rearrangeKitchenOrderInstances()
+    print("deleted!")
+
+  def rearrangeKitchenOrderInstances(self, event=None) :
+    w = self.kitchenOrdersFrame.winfo_width()
+    #print("width:" + str(w))
+
+    columns = max(1, w // (self.kitchenOrderInstanceWidth + 30))
+    #print("column amount: " + str(columns))
+
+    for i, (orderNum, instance) in enumerate(self.__kitchenOrderInstances.items()) :
+      row_no = i // columns
+      col_no = i % columns
+
+      instance.grid(column=col_no, row=row_no, padx=15, pady=50)
 
   #History Page
   def initHistoryPage(self) :

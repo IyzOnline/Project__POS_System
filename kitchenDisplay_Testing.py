@@ -72,7 +72,7 @@ def rearrangeInstances(event=None) :
 
 def tempRemoveInstance(key, currentInstance) :
   print(key)
-  currentInstance.detroy()
+  currentInstance.destroy()
   del kitchenOrderInstances[key]
   rearrangeInstances()
   print("deleted!")
