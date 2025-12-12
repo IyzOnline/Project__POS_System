@@ -36,6 +36,8 @@ def startCashierThread() :
   checkServerConnection()
 
 def runCashierServer() :
+    global clientConnection, serverConnected
+    
     SERVER_IP = '0.0.0.0'
     PORT = 65432
     try :
@@ -90,10 +92,9 @@ def runKitchenClient() :
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
       print("Hmmm")
-      clientSocket.bind(('10.0.0.2', 0))
       try :
         print("Start connection")
-        clientSocket.connect((targetIP, targetPORT))
+        clientSocket.connect(('10.0.0.1', 65432))
         print("Connected to Cashier!")
 
         while True :
