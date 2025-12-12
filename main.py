@@ -51,10 +51,11 @@ class App(tk.Tk) :
     self.checkServerConnection()
 
   def runCashierServer(self) :
-    SERVER_IP = '10.0.0.1'
+    SERVER_IP = '0.0.0.0'
     PORT = 65432
     try :
       with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serverSocket:
+        serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         serverSocket.bind((SERVER_IP, PORT))
         serverSocket.listen()
         print(f"listening")
@@ -69,7 +70,7 @@ class App(tk.Tk) :
       print(f"Server Error: {e}")
 
   def checkServerConnection(self):
-    if hasattr(self, 'serverConnected') and self.serverConnected:
+    if self.serverConnected:
         self.connectToKitchenBtn.config(state=tk.NORMAL)
         self.connectionLbl.config(text="Status: Connected to Kitchen.", fg="green")
     else:
