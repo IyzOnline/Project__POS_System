@@ -72,7 +72,6 @@ class App(tk.Tk) :
 
   def checkServerConnection(self):
     if self.serverConnected:
-        self.connectToKitchenBtn.config(state=tk.NORMAL)
         self.connectionLbl.config(text="Status: Connected to Kitchen.", fg="green")
     else:
         self.after(100, self.checkServerConnection)
