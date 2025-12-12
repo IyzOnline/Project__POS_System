@@ -27,6 +27,7 @@ class App(tk.Tk) :
     self.__SavedItemQuantity = {}
     self.__ReceiptListInstances = {}
     self.__OrderRecords = {}
+    self.__kitchenOrderInstances = {}
     self.total = tk.DoubleVar(value=0)
     self.order = Order(self.__MenuItemInstances, self.__conn, self.__cursor, self.commitDBChanges, self.resetForNewOrder)
 
