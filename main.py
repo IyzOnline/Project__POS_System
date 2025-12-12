@@ -37,13 +37,22 @@ class App(tk.Tk) :
 
 #Networking
   def connectToKitchen(self) :
-    self.connectToKitchenBtn.config(state=tk.DISABLED)
+    self.disableButtonsforCashierMode()
     self.connectionLbl.config(text="Status: Connecting to Kitchen...", fg="orange")
     self.startServerThread()
 
   def connectToCashier(self) :
-    self.connectToCashierBtn.config(state=tk.DISABLED)
+    self.disableButtonsForKitchenMode()
     self.startClientThread()
+
+  def disableButtonsforCashierMode(self) :
+    self.connectToKitchenBtn.config(state=tk.DISABLED)
+    self.kitchenPageBtn.config(state=tk.DISABLED)
+
+  def disableButtonsForKitchenMode(self) :
+    self.connectToCashierBtn.config(state=tk.DISABLED)
+    self.cashierPageBtn.config(state=tk.DISABLED)
+    self.historyPageBtn.config(state=tk.DISABLED)
 
   def startServerThread(self) :
     serverThread = threading.Thread(target=self.runCashierServer)
