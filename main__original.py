@@ -594,11 +594,6 @@ class App(tk.Tk) :
       else :
         self.kitchenConnectionLbl.config(text="Status: Connected to Cashier.", fg="orange")
 
-    if not self.kitchenOrdersFrame.winfo_children():
-      self.tempKitchenOrderLbl = ttk.Label(self.kitchenOrdersFrame, text="Waiting for orders...")
-      self.tempKitchenOrderLbl.pack()
-      #self.kitchenOrdersFrame.grid_columnconfigure(0, weight=1)
-      #tempKitchenOrderLbl.grid(column=0, row=0, pady=10)
     if self.__kitchenOrderInstances :
       self.rearrangeKitchenOrderInstances()
 
