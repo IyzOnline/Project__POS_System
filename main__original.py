@@ -209,7 +209,10 @@ class App(tk.Tk) :
 
     if self.__connectionAttempted :
       self.connectToKitchenBtn.config(state=tk.DISABLED)
-      self.cashierConnectionLbl.config(text="Status: Connecting to Kitchen...", fg="orange")
+      if self.serverConnected :
+        self.cashierConnectionLbl.config(text="Status: Connected to Kitchen.", fg="green")
+      else :
+        self.cashierConnectionLbl.config(text="Status: Connecting to Kitchen...", fg="orange")
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
@@ -585,7 +588,10 @@ class App(tk.Tk) :
 
     if self.__connectionAttempted :
       self.connectToKitchenBtn.config(state=tk.DISABLED)
-      self.kitchenConnectionLbl.config(text="Status: Connecting to Cashier...", fg="orange")
+      if self.serverConnected :
+        self.kitchenConnectionLbl.config(text="Status: Connecting to Cashier...", fg="orange")
+      else :
+        self.kitchenConnectionLbl.config(text="Status: Connected to Cashier.", fg="orange")
 
     if not self.kitchenOrdersFrame.winfo_children():
       self.tempKitchenOrderLbl = ttk.Label(self.kitchenOrdersFrame, text="Waiting for orders...")
