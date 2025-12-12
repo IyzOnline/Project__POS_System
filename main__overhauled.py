@@ -57,11 +57,12 @@ class App(tk.Tk) :
 #Networking
   def connectToKitchen(self) :
     self.disableButtonsforCashierMode()
-    self.connectionLbl.config(text="Status: Connecting to Kitchen...", fg="orange")
+    self.cashierConnectionLbl.config(text="Status: Connecting to Kitchen...", fg="orange")
     self.startServerThread()
 
   def connectToCashier(self) :
     self.disableButtonsForKitchenMode()
+    self.kitchenConnectionLbl.config(text="Status: Connecting to Cashier...", fg="orange")
     self.startClientThread()
 
   def disableButtonsforCashierMode(self) :
@@ -100,7 +101,8 @@ class App(tk.Tk) :
 
   def checkServerConnection(self):
     if self.serverConnected:
-        self.connectionLbl.config(text="Status: Connected to Kitchen.", fg="green")
+        self.kitchenConnectionLbl.config(text="Status: Connected to Cashier.", fg="green")
+        self.cashierConnectionLbl.config(text="Status: Connected to Kitchen.", fg="green")
     else:
         self.after(100, self.checkServerConnection)
 
@@ -221,12 +223,12 @@ class App(tk.Tk) :
     createBtn = ttk.Button(self.menuLowerBtns, text="Add Menu Item", command=lambda: self.transitionFrame(self.initCreateMIPage))
     deleteBtn = ttk.Button(self.menuLowerBtns, text="Delete Menu Item", command=self.cantDeletePopUp)
     self.connectToKitchenBtn = ttk.Button(self.menuLowerBtns, text="Connect to Kitchen PC", command = lambda: self.connectToKitchen())
-    self.connectionLbl = tk.Label(self.menuLowerBtns, text="Status: Not Connected to Kitchen...", fg="red")
+    self.cashierConnectionLbl = tk.Label(self.menuLowerBtns, text="Status: Not Connected to Kitchen...", fg="red")
 
     createBtn.pack(side=tk.LEFT, padx=5, pady=5)
     deleteBtn.pack(side=tk.LEFT, padx=5, pady=5)
     self.connectToKitchenBtn.pack(side=tk.LEFT, padx=5, pady=5)
-    self.connectionLbl.pack(side=tk.LEFT, padx=5, pady=5)
+    self.cashierConnectionLbl.pack(side=tk.LEFT, padx=5, pady=5)
 
     self.initMenuTableColumns()
     self.initializeMenuItems(None)
@@ -616,8 +618,14 @@ class App(tk.Tk) :
     self.kitchenOrdersFrame = tk.Frame(self.kitchenPageMainFrame, background="#4d4d4d", highlightbackground="white", highlightthickness=2)
     self.kitchenOrdersFrame.pack(expand=True, fill="both", padx=10, pady=10)
 
-    self.connectToCashierBtn = ttk.Button(self.kitchenPageMainFrame, text="Connect to Cashier PC", command=self.connectToCashier())
-    self.connectToCashierBtn.pack(pady=20, anchor="center")
+    self.connectToCashierBtn = ttk.Button(self.kitchenPageMainFrame, text="Connect to Cashier PC", command=self.connectToCashier)
+    self.connectToCashierBtn.pack(side=tk.LEFT, padx=10, pady=10)
+    self.kitchenConnectionLbl = tk.Label(self.kitchenPageMainFrame, text="Status: Not Connected to Cashier...", fg="red")
+    self.kitchenConnectionLbl.pack(side=tk.LEFT, padx=10, pady=10)
+
+    if self.__connectionAttempted :
+      self.connectToKitchenBtn.config(state=tk.DISABLED)
+      self.kitchenConnectionLbl.config(text="Status: Connecting to Cashier...", fg="orange")
 
     if not self.kitchenOrdersFrame.winfo_children():
       self.tempKitchenOrderLbl = ttk.Label(self.kitchenOrdersFrame, text="Waiting for orders...")
