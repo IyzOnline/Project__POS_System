@@ -99,6 +99,7 @@ class App(tk.Tk) :
             break
 
           self.__receivedOrderInfo = json.loads(packet.decode('utf-8'))
+          self.after(0, self.createKitchenOrderInstance)
 
           print(f"RECEIVED ORDER: {self.__receivedOrderInfo}")
       except ConnectionRefusedError :
@@ -173,7 +174,7 @@ class App(tk.Tk) :
     self.kitchenOrdersFrame = tk.Frame(kitchenModeFrame, background="#4d4d4d", highlightbackground="white", highlightthickness=2)
     self.kitchenOrdersFrame.pack(expand=True, fill="both", padx=10, pady=10)
 
-    self.connectToCashierBtn = ttk.Button(kitchenModeFrame, text="Connect to Cashier PC", command=lambda: self.connectToCashier())
+    self.connectToCashierBtn = ttk.Button(kitchenModeFrame, text="Connect to Cashier PC", command=self.connectToCashier())
     self.connectToCashierBtn.pack(pady=20, anchor="center")
 
     if not self.kitchenOrdersFrame.winfo_children():
@@ -182,29 +183,32 @@ class App(tk.Tk) :
       #self.kitchenOrdersFrame.grid_columnconfigure(0, weight=1)
       #tempKitchenOrderLbl.grid(column=0, row=0, pady=10)
 
-  def displayKitchenOrderInstance(self) :
-    if self.tempKitchenOrderLbl :
-      self.tempKitchenOrderLbl.destroy()
-    
-    instanceFrame = tk.Frame(self.kitchenOrdersFrame, width=200, height=300)
+  def createKitchenOrderInstance(self) :
+    self.kitchenOrderInstanceWidth = 200
+    for orderNum, itemsInOrder in self.__receivedOrderInfo.items():
+      print(f"Order Number {orderNum}: ")
+      instance = tk.Frame(self.kitchenOrdersFrame, width=self.kitchenOrderInstanceWidth, height=300, background="white")
+      instance.pack_propagate(False)
+      
+      contentFrame = tk.Frame(instance)
+      contentFrame.pack(expand=True, fill="both", padx=10, pady=10)
+      tk.Label(contentFrame, text=f"Order Number {orderNum}").pack(fill="x", pady=10)
 
-    for orderNum, orderItems in self.__receivedOrderInfo.items() :
-      tk.Label(instanceFrame, text=f"Order {orderNum}").pack()
-      for itemName, itemData in orderItems.items():
-        itemRowFrame = tk.Frame(instanceFrame)
-        name = itemData[0]
-        quantity = itemData[2]
-        tk.Label(itemRowFrame, text=name).pack(side="left", padx=10)
-        tk.Label(itemRowFrame, text=quantity).pack(side="right", pady=10)
-        itemRowFrame.pack(fill="x", expand=True)
+      for itemName, quantity in itemsInOrder.items():
+        print(itemName, quantity)
+        itemFrame = tk.Frame(contentFrame)
 
-    buttonFrame = tk.Frame(instanceFrame)
-    buttonFrame.pack(fill="x", expand=True)
+        tk.Label(itemFrame, text=itemName).pack(side="left", padx=10)
+        tk.Label(itemFrame, text=quantity).pack(side="right", padx=10)
 
-    tk.Button(buttonFrame, text="Completed", command=instanceFrame.destroy).pack(side="left", padx=10)
-    tk.Button(buttonFrame, text="Cancelled", command=instanceFrame.destroy).pack(side="right", pady=10)
+        itemFrame.pack(fill="x", pady=5)
 
-    instanceFrame.pack()
+      buttonsFrame = tk.Frame(instance)
+      tk.Button(buttonsFrame, text="DONE").pack(side="left", padx=10)
+      tk.Button(buttonsFrame, text="CANCEL").pack(side="left", padx=10)
+      buttonsFrame.pack()
+      print("======")
+      self.__kitchenOrderInstances[orderNum] = instance
 
   #History Page
   def initHistoryPage(self) :
