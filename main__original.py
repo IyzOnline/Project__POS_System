@@ -8,7 +8,7 @@ import socket
 import json
 import threading
 import os
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
 class App(tk.Tk) :
   def __init__(self):
@@ -111,8 +111,9 @@ class App(tk.Tk) :
         self.after(100, self.checkServerConnectionKitchenClient)
 
   def runKitchenClient(self) :
-    load_dotenv()
-    targetIP = os.getenv("IP_ADDRESS")
+    #load_dotenv()
+    #targetIP = os.getenv("IP_ADDRESS")
+    targetIP = '192.168.1.10'
     targetPORT = 65432
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
