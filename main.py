@@ -311,13 +311,13 @@ class App(tk.Tk) :
     self.sidebarFrame = tk.Frame(self, bg="#3498db")
     self.sidebarFrame.pack(side=tk.LEFT, fill="y")
 
-    cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Mode", command=lambda: self.transitionFrame(self.initCashierMode))
-    kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Mode", command=lambda: self.transitionFrame(self.initKitchenMode))
-    historyPageBtn = ttk.Button(self.sidebarFrame, text="History Page", command=lambda: self.transitionFrame(self.initHistoryPage))
+    self.cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Mode", command=lambda: self.transitionFrame(self.initCashierMode))
+    self.kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Mode", command=lambda: self.transitionFrame(self.initKitchenMode))
+    self.historyPageBtn = ttk.Button(self.sidebarFrame, text="History Page", command=lambda: self.transitionFrame(self.initHistoryPage))
 
-    cashierPageBtn.pack(padx=5, pady=5)
-    kitchenPageBtn.pack(padx=5, pady=5)
-    historyPageBtn.pack(padx=5, pady=5)
+    self.cashierPageBtn.pack(padx=5, pady=5)
+    self.kitchenPageBtn.pack(padx=5, pady=5)
+    self.historyPageBtn.pack(padx=5, pady=5)
 
   #Menu
   def initializeMenuArea(self) :
