@@ -48,7 +48,9 @@ def runCashierServer() :
         print(f"listening")
         print(socket.gethostbyname(socket.gethostname()))
 
+        print("Any sockets chat?")
         conn, addr = serverSocket.accept()
+        print(f"Connection initiated with {addr}")
 
         clientConnection = conn
         serverConnected = True
