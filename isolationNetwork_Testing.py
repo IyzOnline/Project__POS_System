@@ -88,6 +88,7 @@ def startKitchenThread() :
   checkServerConnection()
 
 def runKitchenClient() :
+    global serverConnected
     load_dotenv()
     targetIP = os.getenv("IP_ADDRESS")
     targetPORT = 65432
@@ -98,6 +99,7 @@ def runKitchenClient() :
       try :
         print("Start connection")
         clientSocket.connect((targetIP, targetPORT))
+        serverConnected = True
         print("Connected to Cashier!")
 
         while True :
