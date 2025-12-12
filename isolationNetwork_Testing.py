@@ -62,7 +62,8 @@ def runCashierServer() :
 def checkServerConnection():
   if serverConnected:
       kitchenModeBtn.config(state=tk.NORMAL)
-      statusLabel.config(text="Status: Connected to Kitchen.", fg="green")
+      cashierModeBtn.config(state=tk.NORMAL)
+      statusLabel.config(text="Status: Kitchen and Cashier are Connected.", fg="green")
   else:
       root.after(100, checkServerConnection)
 
@@ -77,6 +78,7 @@ def startKitchenThread() :
   serverThread = threading.Thread(target=runKitchenClient)
   serverThread.daemon = True
   serverThread.start()
+  checkServerConnection()
 
 def runKitchenClient() :
     load_dotenv()
@@ -84,6 +86,7 @@ def runKitchenClient() :
     targetPORT = 65432
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
+      clientSocket.bind(('10.0.0.2', 0))
       try :
         clientSocket.connect((targetIP, targetPORT))
         print("Connected to Cashier!")
