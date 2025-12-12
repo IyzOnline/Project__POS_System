@@ -97,7 +97,7 @@ def runKitchenClient() :
       print("Hmmm")
       try :
         print("Start connection")
-        clientSocket.connect(('10.0.0.1', 65432))
+        clientSocket.connect((targetIP, targetPORT))
         print("Connected to Cashier!")
 
         while True :
