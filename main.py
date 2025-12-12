@@ -996,7 +996,7 @@ class Order() :
 
     for key, value in self.__ItemsInOrder.items():
       self.__cursor.execute("INSERT INTO order_items (orderID, name, price, category, quantity) VALUES (?, ?, ?, ?, ?)", (self.orderNum, *value))
-      data[self.orderNum][value[0]] = [value[0], value[3]]
+      data[self.orderNum][value[0]] = [value[3]]
 
     self.commitDBChanges("Saved items in receipt to order_items table in DB.")
     print(f"Data to be transferred: {data}")
