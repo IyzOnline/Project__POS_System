@@ -830,7 +830,6 @@ class App(tk.Tk) :
       self.fieldsErrorPopUp("Input for price must be a real number.")
       return
 
-    
     print(f"Here is data in adding: {data}")
     self.__cursor.execute("INSERT INTO menu_items (name, price, category) VALUES (?, ?, ?)", data)
 
@@ -843,13 +842,18 @@ class App(tk.Tk) :
     self.__MenuItemRecords[MenuItemRecord['name']] = MenuItemRecord
 
     self.commitDBChanges("d: prototype data saved to menu_items table in DB")
+    popUp = self.createPopUp(self.mainFrame)
+    contentFrame = tk.Frame(popUp, padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+    ttk.Label(contentFrame, text=f"Added {data[0]} to Menu Items").pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Return", command=popUp.destroy).pack(pady=10, anchor="center")
 
   def fieldsErrorPopUp(self, message) :
     popUp = self.createPopUp(self.mainFrame)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
     ttk.Label(contentFrame, text=message).pack(pady=10, anchor="center")
-    ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Return", command=popUp.destroy).pack(pady=10, anchor="center")
 
   def printMenuLength(self) :
     print(len(self.__MenuItemRecords))
