@@ -898,13 +898,6 @@ class App(tk.Tk) :
     ttk.Label(contentFrame, text=message).pack(pady=10, anchor="center")
     ttk.Button(contentFrame, text="Return to Order", command=popUp.destroy).pack(pady=10, anchor="center")
 
-  def removeMenuItem(self) :
-    #need to ask for confirmation from user then delete from DB
-    self.__cursor.execute("DELETE ")
-
-  def editMenuItem(self) :
-    self.__cursor.execute("UPDATE ")
-
   def printMenuLength(self) :
     print(len(self.__MenuItemRecords))
 
