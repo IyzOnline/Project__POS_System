@@ -845,7 +845,7 @@ class App(tk.Tk) :
     popUp = self.createPopUp(self.mainFrame)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
-    ttk.Label(contentFrame, text=f"Added {data[0]} to Menu Items").pack(pady=10, anchor="center")
+    ttk.Label(contentFrame, text=f"Successfully added {data[0]} to Menu Items.").pack(pady=10, anchor="center")
     ttk.Button(contentFrame, text="Return", command=popUp.destroy).pack(pady=10, anchor="center")
 
   def fieldsErrorPopUp(self, message) :
