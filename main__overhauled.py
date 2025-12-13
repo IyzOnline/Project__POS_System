@@ -140,7 +140,6 @@ class App(tk.Tk) :
           print(f"RECEIVED ORDER: {self.__receivedOrderInfo}")
       except ConnectionRefusedError :
         print("Could not connect. Is the server listening?")
-        self.connectToCashierBtn.config(state=tk.NORMAL)
       except Exception as e :
         print(f"An error occurred: {e}")
     
