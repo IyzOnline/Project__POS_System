@@ -233,6 +233,7 @@ class App(tk.Tk) :
     print(f"Current search string: {searchString}")
     for row in self.menuTable.winfo_children() :
       row.destroy()
+    self.initMenuTableColumns()
     self.initializeMenuItems(searchString)
     print("Search complete.")
 
