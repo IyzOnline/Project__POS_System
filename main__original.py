@@ -119,27 +119,31 @@ class App(tk.Tk) :
     targetIP = '192.168.1.10'
     targetPORT = 65432
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
-      try :
-        clientSocket.connect((targetIP, targetPORT))
-        print("Connected to Cashier!")
-        self.serverConnected = True
+    self.clientSocket =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try :
+      self.clientSocket.connect((targetIP, targetPORT))
+      print("Connected to Cashier!")
+      self.serverConnected = True
 
-        while True :
-          packet = clientSocket.recv(4096)
+      while True :
+        packet = self.clientSocket.recv(4096)
 
-          if not packet :
-            print("Server disconnected.")
-            break
+        if not packet :
+          print("Server disconnected.")
+          break
 
-          self.__receivedOrderInfo = json.loads(packet.decode('utf-8'))
-          self.after(0, self.createKitchenOrderInstance)
+        self.__receivedOrderInfo = json.loads(packet.decode('utf-8'))
+        self.after(0, self.createKitchenOrderInstance)
+        print(f"RECEIVED ORDER: {self.__receivedOrderInfo}")
 
-          print(f"RECEIVED ORDER: {self.__receivedOrderInfo}")
-      except ConnectionRefusedError :
-        print("Could not connect. Is the server listening?")
-      except Exception as e :
-        print(f"An error occurred: {e}")
+    except ConnectionRefusedError :
+      print("Could not connect. Is the server listening?")
+    except Exception as e :
+      print(f"An error occurred: {e}")
+    finally: 
+      print("Closing connection...") 
+      self.clientSocket.close() 
+      self.serverConnected = False
 
   def startCashierListening(self) :
     while self.serverConnected :
@@ -644,20 +648,31 @@ class App(tk.Tk) :
         itemFrame.pack(fill="x", pady=5)
 
       buttonsFrame = tk.Frame(instance)
-      tk.Button(buttonsFrame, text="DONE", command=lambda: self.tempRemoveInstance(orderNum, instance)).pack(side="left", padx=10)
-      tk.Button(buttonsFrame, text="CANCEL", command=lambda: self.tempRemoveInstance(orderNum, instance)).pack(side="left", padx=10)
+      tk.Button(buttonsFrame, text="DONE", command=lambda: self.removeInstance(orderNum, instance, True)).pack(side="left", padx=10)
+      tk.Button(buttonsFrame, text="CANCEL", command=lambda: self.removeInstance(orderNum, instance, False)).pack(side="left", padx=10)
       buttonsFrame.pack()
       print("======")
       self.__receivedOrderInfo = None
       self.__kitchenOrderInstances[orderNum] = instance
     self.rearrangeKitchenOrderInstances()
 
-  def tempRemoveInstance(self, key, currentInstance) :
+  def removeInstance(self, key, currentInstance, status) :
     print(key)
     currentInstance.destroy()
     del self.__kitchenOrderInstances[key]
     self.rearrangeKitchenOrderInstances()
     print("deleted!")
+    self.updateCashier(key, status)
+
+  def updateCashier(self, key, status) :
+    updateData = [key, status]
+    try : 
+      updateDataInBytes = json.dumps(updateData).encode('utf-8')
+      self.clientSocket.sendall(updateDataInBytes)
+      print(f"Update sent: {updateData}")
+    except Exception as e:
+      print(f"Error in sending data: {e}")
+
 
   def rearrangeKitchenOrderInstances(self, event=None) :
     w = self.kitchenOrdersFrame.winfo_width()
