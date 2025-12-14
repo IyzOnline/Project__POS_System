@@ -672,7 +672,7 @@ class App(tk.Tk) :
       print(f"Update sent: {updateData}")
     except Exception as e:
       print(f"Error in sending data: {e}")
-
+      self.serverConnected = False
 
   def rearrangeKitchenOrderInstances(self, event=None) :
     w = self.kitchenOrdersFrame.winfo_width()
