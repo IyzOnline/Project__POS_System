@@ -95,6 +95,9 @@ class App(tk.Tk) :
         self.clientConnection = conn
         self.serverConnected = True
         print("Connected to Kitchen!")
+
+        cashierListeningThread = threading.Thread(target=self.startCashierListening, daemon=True)
+        cashierListeningThread.start()
     except Exception as e :
       print(f"Server Error: {e}")
 
@@ -137,7 +140,30 @@ class App(tk.Tk) :
         print("Could not connect. Is the server listening?")
       except Exception as e :
         print(f"An error occurred: {e}")
-    
+
+  def startCashierListening(self) :
+    while self.serverConnected :
+      try :
+        packet = self.clientConnection.recv(1024)
+
+        if not packet :
+          print("Kitchen Client has disconnected from Cashier Server.")
+          self.serverConnected = False
+          break
+        
+        orderInfo = json.loads(packet.decode('utf-8'))
+        orderNumber = orderInfo[0]
+        orderStatus = orderInfo[1]
+        print(f"Order Number {orderNumber}: ", end="")
+        if orderStatus :
+          print("Done!")
+        else :
+          print("Cancelled.")
+      except Exception as e :
+        print(f"There was an error in receiving data: {e}")
+        self.serverConnected = False
+        break
+
 #UI Implementation
   def initStyles(self) :
     self.style = ttk.Style()
