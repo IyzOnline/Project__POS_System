@@ -726,8 +726,8 @@ class App(tk.Tk) :
     self.sidebarFrame = tk.Frame(self, bg="#3498db")
     self.sidebarFrame.pack(side=tk.LEFT, fill="y")
 
-    self.cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Mode", command=lambda: self.transitionFrame(self.initializeCashierPage))
-    self.kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Mode", command=lambda: self.transitionFrame(self.initializeKitchenPage))
+    self.cashierPageBtn = ttk.Button(self.sidebarFrame, text="Cashier Page", command=lambda: self.transitionFrame(self.initializeCashierPage))
+    self.kitchenPageBtn = ttk.Button(self.sidebarFrame, text="Kitchen Page", command=lambda: self.transitionFrame(self.initializeKitchenPage))
     self.historyPageBtn = ttk.Button(self.sidebarFrame, text="History Page", command=lambda: self.transitionFrame(self.initializeHistoryPage))
 
     self.cashierPageBtn.pack(padx=5, pady=5)
