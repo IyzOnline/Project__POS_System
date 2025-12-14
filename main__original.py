@@ -163,6 +163,8 @@ class App(tk.Tk) :
           print("Done!")
         else :
           print("Cancelled.")
+
+        self.after(0, self.generateUpdatePopUp)
       except Exception as e :
         print(f"There was an error in receiving data: {e}")
         self.serverConnected = False
@@ -453,6 +455,17 @@ class App(tk.Tk) :
     ttk.Label(contentFrame, text=f"Are you sure you want to delete Menu Item '{name}'?").pack(pady=10, anchor="center")
     ttk.Button(contentFrame, text="Confirm", command=lambda: self.deleteMenuItem(itemRow, name, popUp)).pack(pady=10, anchor="center")
     ttk.Button(contentFrame, text="Return to Deletion Page", command=popUp.destroy).pack(pady=10, anchor="center")
+
+  def generateUpdatePopUp(self, orderNumber, status) :
+    popUp = self.createPopUp(self)
+    contentFrame = tk.Frame(popUp, padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+    updateLabel = ttk.Label(contentFrame, text="").pack(pady=10, anchor="center")
+    if status : 
+      updateLabel.config(text=f"Order Number {orderNumber}: Done!", fg="green")
+    else :
+      updateLabel.config(text=f"Order Number {orderNumber}: Cancelled.", fg="red")
+    ttk.Button(contentFrame, text="Return", command=popUp.destroy).pack(pady=10, anchor="center")
 
   #Receipt
   def initializeReceipt(self) :
