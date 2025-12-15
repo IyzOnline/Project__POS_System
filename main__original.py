@@ -79,7 +79,7 @@ class App(tk.Tk) :
 
   def runCashierServer(self) :
     SERVER_IP = '0.0.0.0'
-    PORT = 65432
+    PORT = 5000
     try :
       with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serverSocket:
         serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -115,7 +115,7 @@ class App(tk.Tk) :
     #load_dotenv()
     #targetIP = os.getenv("IP_ADDRESS")
     targetIP = '192.168.1.10'
-    targetPORT = 65432
+    targetPORT = 5000
 
     self.clientSocket =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try :
