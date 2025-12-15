@@ -138,6 +138,7 @@ class App(tk.Tk) :
       print("Could not connect. Is the server listening?")
     except Exception as e :
       print(f"An error occurred: {e}")
+      self.after(0, self.kitchenErrorPopUp)
     finally: 
       print("Closing connection...") 
       self.clientSocket.close() 
