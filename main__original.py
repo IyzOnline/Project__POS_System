@@ -7,8 +7,6 @@ import datetime
 import socket
 import json
 import threading
-import os
-#from dotenv import load_dotenv
 
 class App(tk.Tk) :
   def __init__(self):
@@ -44,7 +42,7 @@ class App(tk.Tk) :
     self.initializeSidebar()
     self.initializeMainFrame()
     self.initializeCashierPage()
-
+ 
 #Networking
   def connectToKitchen(self) :
     self.disableButtonsforCashierMode()
@@ -173,6 +171,13 @@ class App(tk.Tk) :
         print(f"There was an error in receiving data: {e}")
         self.serverConnected = False
         break
+
+  def kitchenErrorPopUp(self, message) :
+    popUp = self.createPopUp(self)
+    contentFrame = tk.Frame(popUp, padx=10, pady=10)
+    contentFrame.pack(expand=True, anchor="center")
+    ttk.Label(contentFrame, text=f"Connection Error: See if server and client are connected").pack(pady=10, anchor="center")
+    ttk.Button(contentFrame, text="Return", command=popUp.destroy).pack(pady=10, anchor="center")
 
 #UI Implementation
   def initStyles(self) :
