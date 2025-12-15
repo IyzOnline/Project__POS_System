@@ -470,7 +470,7 @@ class App(tk.Tk) :
     popUp = self.createPopUp(self)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
-    updateLabel = ttk.Label(contentFrame, text="")
+    updateLabel = tk.Label(contentFrame, text="")
     updateLabel.pack(pady=10, anchor="center")
     if status : 
       updateLabel.config(text=f"Order Number {orderNumber}: Done!", fg="green")
