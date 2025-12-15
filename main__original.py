@@ -173,7 +173,7 @@ class App(tk.Tk) :
         self.serverConnected = False
         break
 
-  def kitchenErrorPopUp(self, message) :
+  def kitchenErrorPopUp(self) :
     popUp = self.createPopUp(self)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
