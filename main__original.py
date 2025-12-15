@@ -81,23 +81,30 @@ class App(tk.Tk) :
     SERVER_IP = '0.0.0.0'
     PORT = 5000
     try :
-      with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serverSocket:
-        serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        serverSocket.bind((SERVER_IP, PORT))
-        serverSocket.listen()
-        print(f"listening")
-        print(socket.gethostbyname(socket.gethostname()))
+      self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      self.serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+      self.serverSocket.bind((SERVER_IP, PORT))
+      self.serverSocket.listen()
+      print(f"listening")
+      print(socket.gethostbyname(socket.gethostname()))
 
-        conn, addr = serverSocket.accept()
+      conn, addr = self.serverSocket.accept()
 
-        self.clientConnection = conn
-        self.serverConnected = True
-        print("Connected to Kitchen!")
+      self.clientConnection = conn
+      self.serverConnected = True
+      print("Connected to Kitchen!")
 
-        cashierListeningThread = threading.Thread(target=self.startCashierListening, daemon=True)
-        cashierListeningThread.start()
+      cashierListeningThread = threading.Thread(target=self.startCashierListening, daemon=True)
+      cashierListeningThread.start()
     except Exception as e :
-      print(f"Server Error: {e}")
+      print(f"An error occurred: {e}")
+      self.after(0, self.connectionErrorPopUp)
+    finally: 
+      print("Closing connection...") 
+      self.serverSocket.close() 
+      self.serverConnected = False
+      self.__connectionAttempted = False
+      self.after(0, lambda: self.transitionFrame(self.initializeCashierPage))
 
   def checkServerConnectionCashierServer(self):
     if self.serverConnected:
@@ -138,7 +145,7 @@ class App(tk.Tk) :
       print("Could not connect. Is the server listening?")
     except Exception as e :
       print(f"An error occurred: {e}")
-      self.after(0, self.kitchenErrorPopUp)
+      self.after(0, self.connectionErrorPopUp)
     finally: 
       print("Closing connection...") 
       self.clientSocket.close() 
@@ -173,7 +180,7 @@ class App(tk.Tk) :
         self.serverConnected = False
         break
 
-  def kitchenErrorPopUp(self) :
+  def connectionErrorPopUp(self) :
     popUp = self.createPopUp(self)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
