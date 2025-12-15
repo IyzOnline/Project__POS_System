@@ -642,7 +642,7 @@ class App(tk.Tk) :
     self.kitchenConnectionLbl.pack(side=tk.LEFT, padx=10, pady=10)
 
     if self.__connectionAttempted :
-      self.connectToKitchenBtn.config(state=tk.DISABLED)
+      self.connectToCashierBtn.config(state=tk.DISABLED)
       if self.serverConnected :
         self.kitchenConnectionLbl.config(text="Status: Connecting to Cashier...", fg="orange")
       else :
