@@ -99,12 +99,6 @@ class App(tk.Tk) :
     except Exception as e :
       print(f"An error occurred: {e}")
       self.after(0, self.connectionErrorPopUp)
-    finally: 
-      print("Closing connection...") 
-      self.serverSocket.close() 
-      self.serverConnected = False
-      self.__connectionAttempted = False
-      self.after(0, lambda: self.transitionFrame(self.initializeCashierPage))
 
   def checkServerConnectionCashierServer(self):
     if self.serverConnected:
@@ -179,12 +173,19 @@ class App(tk.Tk) :
         print(f"There was an error in receiving data: {e}")
         self.serverConnected = False
         break
+    
+    print("Closing connection...") 
+    self.serverSocket.close() 
+    self.serverConnected = False
+    self.__connectionAttempted = False
+    self.after(0, lambda: self.transitionFrame(self.initializeCashierPage))
+    self.after(0, self.connectionErrorPopUp)
 
   def connectionErrorPopUp(self) :
     popUp = self.createPopUp(self)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
-    ttk.Label(contentFrame, text=f"Connection Error: Server and Client are not Connected.").pack(pady=10, anchor="center")
+    ttk.Label(contentFrame, text=f"Connection Error: Server & Client not Connected").pack(pady=10, anchor="center")
     ttk.Button(contentFrame, text="Return", command=popUp.destroy).pack(pady=10, anchor="center")
 
 #UI Implementation
