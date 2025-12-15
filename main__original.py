@@ -144,6 +144,8 @@ class App(tk.Tk) :
       print("Closing connection...") 
       self.clientSocket.close() 
       self.serverConnected = False
+      self.__connectionAttempted = False
+      self.after(0, lambda: self.transitionFrame(self.initializeKitchenPage))
 
   def startCashierListening(self) :
     while self.serverConnected :
@@ -153,6 +155,8 @@ class App(tk.Tk) :
         if not packet :
           print("Kitchen Client has disconnected from Cashier Server.")
           self.serverConnected = False
+          self.__connectionAttempted = False
+          self.after(0, lambda: self.transitionFrame(self.initializeCashierPage))
           break
         
         orderInfo = json.loads(packet.decode('utf-8'))
