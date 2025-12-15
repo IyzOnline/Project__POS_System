@@ -167,7 +167,7 @@ class App(tk.Tk) :
         else :
           print("Cancelled.")
 
-        self.after(0, self.generateUpdatePopUp)
+        self.after(0, lambda: self.generateUpdatePopUp(orderNumber, orderStatus))
       except Exception as e :
         print(f"There was an error in receiving data: {e}")
         self.serverConnected = False
@@ -177,7 +177,7 @@ class App(tk.Tk) :
     popUp = self.createPopUp(self)
     contentFrame = tk.Frame(popUp, padx=10, pady=10)
     contentFrame.pack(expand=True, anchor="center")
-    ttk.Label(contentFrame, text=f"Connection Error: See if server and client are connected").pack(pady=10, anchor="center")
+    ttk.Label(contentFrame, text=f"Connection Error: Server and Client are not Connected.").pack(pady=10, anchor="center")
     ttk.Button(contentFrame, text="Return", command=popUp.destroy).pack(pady=10, anchor="center")
 
 #UI Implementation
